@@ -56,9 +56,11 @@ Estos archivos se encuentran en el directorio principal:
 - `main.py`: Ejecuta toda la cadena de procesos, desde "Audios to Process" a "Audios Transcript" 
 
 ## Orden la cadena
-Los pasos que va a seguir la cadena van a ser los siguientes:
+El diagrama de flujo del proceso entero es el siguiente:
 
-DEN -> VAD -> AA -> FD -> STT
+![ASR Corpus Generator](Utils/assets/diagrama-algoritmo.PNG)
+
+Este repositorio contiene la funcionalidad para la etapa de *Preparar datos* y *Limpiar datos*.
 
 ## Dependencias
 Vamos a hacer un environment nuevo para este proyecto, si tienen algo con pytorch o cualquier ML framework instalar las versiones para usar CPU así nos aseguramos que les puede correr a todos (avisar si no tiene versión con CPU).
@@ -78,8 +80,17 @@ choco install ffmpeg
 Hay que definir audios de prueba los cuales se va a evaluar a mano el funcionamiento deseado y se va a contrastar el ideal con respecto a los resultados generados por la cadena. Por ejemplo, se determina que tiene que haber 30 segmentos de VAD, 24 segmentos después del AA, 22 segmentos después del FD y 18 segmentos después del STT.
 Evidentemente cada parte de la cadena depende de la etapa anterior, así que abría que buscar la manera de realizar los test para que depende lo menos posible de las etapas anteriores.
 
+Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Ejemplo
+1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar X segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*
+
+**Links**
+(Carpeta dataset TEST)[https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing]
+
+Cuando arranquemos compoleto con el otro link
+
+
 ## Formato de los audios
-Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100**. En Utils hay (que hacer) una función para normalizar los audios a este formato. No tiene sentido usar `WAV` si vamos a sacar audios de internet, pero si en la cadena de procesas necesitan ingresar con `WAV` tienen que realizar la conversión, procesar y después guardar en el formato especificado.
+Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100 Hz**. En Utils hay (que hacer) una función para normalizar los audios a este formato. No tiene sentido usar `WAV` si vamos a sacar audios de internet, pero si en la cadena de procesas necesitan ingresar con `WAV` tienen que realizar la conversión, procesar y después guardar en el formato especificado.
 
 ## Commits y pautas del código 
 Pueden tener su branch y hacer pull request para subir sus cambios o pueden directamente trabajar todo en main, eso no me importa. Lo que si traten de ser descriptivos con los commits y tratar de que sean cambios chicos así es más fácil de trackear.
