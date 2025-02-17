@@ -1,5 +1,5 @@
 # ASR Dataset Generator
-La estructura de esté código sirve para audios con 1 solo hablante.
+Este repositorio contiene un algoritmo que permite identificar las mejores secciones de un audio de gran duración. Esto permite generar dataset de mayor calidad para utilizar en diferentes tareas de ASR.
 
 ## Organización estructura código
 ### Carpetas con datos
@@ -76,19 +76,6 @@ sudo apt update && sudo apt install ffmpeg
 # on Windows using Chocolatey (https://chocolatey.org/)
 choco install ffmpeg
 ```
-## Validación y Testeo
-Hay que definir audios de prueba los cuales se va a evaluar a mano el funcionamiento deseado y se va a contrastar el ideal con respecto a los resultados generados por la cadena. Por ejemplo, se determina que tiene que haber 30 segmentos de VAD, 24 segmentos después del AA, 22 segmentos después del FD y 18 segmentos después del STT.
-Evidentemente cada parte de la cadena depende de la etapa anterior, así que abría que buscar la manera de realizar los test para que depende lo menos posible de las etapas anteriores.
-
-Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Ejemplo
-1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar X segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*
-
-**Links**
-(Carpeta dataset TEST)[https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing]
-
-Cuando arranquemos compoleto con el otro link
-
-
 ## Formato de los audios
 Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100 Hz**. En Utils hay (que hacer) una función para normalizar los audios a este formato. No tiene sentido usar `WAV` si vamos a sacar audios de internet, pero si en la cadena de procesas necesitan ingresar con `WAV` tienen que realizar la conversión, procesar y después guardar en el formato especificado.
 
@@ -96,3 +83,16 @@ Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100 H
 Pueden tener su branch y hacer pull request para subir sus cambios o pueden directamente trabajar todo en main, eso no me importa. Lo que si traten de ser descriptivos con los commits y tratar de que sean cambios chicos así es más fácil de trackear.
 
 Para el código, cada función que sea medianamente relevante tiene que tener su doc string con la funcionalidad general y la especificación de los parámetros de entrada y salida con el tipo y descripción.
+
+## Validación y Testeo
+Hay que definir audios de prueba los cuales se va a evaluar a mano el funcionamiento deseado y se va a contrastar el ideal con respecto a los resultados generados por la cadena. Por ejemplo, se determina que tiene que haber 30 segmentos de VAD, 24 segmentos después del AA, 22 segmentos después del FD y 18 segmentos después del STT.
+Evidentemente cada parte de la cadena depende de la etapa anterior, así que abría que buscar la manera de realizar los test para que depende lo menos posible de las etapas anteriores.
+
+Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Ejemplo
+1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar X segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*
+
+**Links** 
+
+[Carpeta dataset TEST](https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing)
+
+Cuando arranquemos completo con el otro link
