@@ -1,1 +1,2 @@
 from STT.whisper import testing_imports
+from AudioAnalyzer.NISQA import run_audio_predict
