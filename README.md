@@ -6,11 +6,17 @@ Este repositorio contiene un algoritmo que permite identificar las mejores secci
 Este es el nombre y función de las carpetas donde se van a almacenar los datos, se tienen que crear para poder ejecutar `main.py`. Están ocultas por git para no trackear datos. Con el archivo `Utils/create_folder_estructure.py` se pueden crear todas las carpetas de forma automática. Todas las carpetas listadas a continuación están dentro de la carpetas *Datos*.
 
 - *Audio_to_Process*: Donde poner los nuevos audios que se van a ir agregando. Una vez que se procesen queda en la carpeta de audios raw y esta carpeta queda vacía.
+
 - *Audios Raw*: Carpeta con audios a procesar (podcast, videos, etc). Va a tener un ID y un nombre separados por un `_`. Ej, 0000_Caja-Negra-Indio-Solari. 
+
 - *Audios_Denoise*: Carpeta donde van los audios denoiseados
+
 - *Audios_VAD*: Dentro de esta carpeta hay subcarpetas con los recortes de los audios largos, va a tener el ID del audio general y un ID por chunk que sea de 4 dígitos (no creo que tengamos un audio con mas de 9999 chunks). Entonces quedaría por ejemplo, "Audios VAD/0000_Caja-Negra-Indio-Solari/0000_0001.mp3"
-- *Audios_Clean*: Segmentos de audios que pasaron por el filtro de (AAC, SD, FD). Mantienen el mismo indice que la sección de VAD, por ejemplo si los primeros dos audio no pasan el filtro el primer audio en esta sección es, "Audios Clean/0000_Caja-Negra-Indio-Solari/0000_0001.mp3"
-- *Audios_Transcript*: Segmentos de audios con las mejores transcripciones. El ejemplo es el mismo que en Audios Clean. Va a haber una carpeta llamada transcrips, donde va a estar el transcript.csv específico de la entrevista/podcast con el nombre. Sería "Audios Transcript/0000_Caja-Negra-Indio-Solari/0000_0004.mp3" y "Audios Transcript/transcripts/0000_Caja-Negra-Indio-Solari"
+
+- *Audios_Clean*: Segmentos de audios que pasaron por el filtro de (AAC, SD, FD). Mantienen el mismo indice que la sección de VAD, por ejemplo si los primeros dos audio no pasan el filtro el primer audio en esta sección es, "Audios Clean/0000_Caja-Negra-Indio-Solari/0000_0001.mp3". También en esta carpeta va a haber una carpeta llamada *removed* donde va a haber un archivo csv donde se va a tener trackeo de todos los audios que fueron descartados por esta sección y cual fue la causa (puede ser el AudioAnalyzer, Risa o Muletilla).
+
+- *Audios_Transcript*: Segmentos de audios con las mejores transcripciones. El ejemplo es el mismo que en Audios Clean. Va a haber una carpeta llamada *transcrips*, donde va a estar el transcript.csv específico de la entrevista/podcast con el nombre. Sería "Audios Transcript/0000_Caja-Negra-Indio-Solari/0000_0004.mp3" y "Audios Transcript/transcripts/0000_Caja-Negra-Indio-Solari"
+
 - *Dataset*: Agrupar todos los mejores fragmentos. Sin subdivisión de carpetas se mezclan todos los datos y se ajustan los indices para tener un Dataset único. 
 
 ### Carpetas del código
