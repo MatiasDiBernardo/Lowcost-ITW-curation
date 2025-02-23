@@ -192,6 +192,7 @@ model = whisper.load_model("tiny")
 
 #--------------------------- PARAMETROS CONFIGURABLES ------------------------------------------------
 
+# Ruta del archivo de audio
 path=r"VAD-FINAL/Oficial gordillo.wav" 
 
 # Escoge el método de optimización (puedes cambiar esta variable rápidamente)
