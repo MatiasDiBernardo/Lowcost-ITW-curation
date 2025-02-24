@@ -69,7 +69,7 @@ El diagrama de flujo del proceso entero es el siguiente:
 Este repositorio contiene la funcionalidad para la etapa de *Preparar datos* y *Limpiar datos*.
 
 ## Dependencias
-Vamos a hacer un environment nuevo para este proyecto, si tienen algo con pytorch o cualquier ML framework instalar las versiones para usar CPU así nos aseguramos que les puede correr a todos (avisar si no tiene versión con CPU).
+Vamos a hacer un environment nuevo para este proyecto, si tienen algo con pytorch o cualquier ML framework instalar las versiones para usar CPU así nos aseguramos que les puede correr a todos (avisar si no tiene versión con CPU). Estamos usando Python 3.9.1, es necesario para compatibilidad de versiones.
 
 Seguramente se repitan muchas dependencias, pongan las versiones de los paquetes necesarios para que funcione su función y vemos si funciona para todos, sino vamos debugeando. Si hay algo externo que hay que instalar para que funcione dejarlo en esta sección.
 

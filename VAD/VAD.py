@@ -6,8 +6,8 @@ import optuna
 from pydub.utils import which
 import os
 import shutil
-from auxiliares import load_to_wav, split_audio_chunks, extract_and_sort_timestamps
-from clasificador_wps import categorize_and_filter_segments,classify_segments_by_speed,get_lowest_speed_category
+from VAD.auxiliares import load_to_wav, split_audio_chunks, extract_and_sort_timestamps
+from VAD.clasificador_wps import categorize_and_filter_segments,classify_segments_by_speed,get_lowest_speed_category
 from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
 import optuna
 
@@ -190,21 +190,19 @@ silero = load_silero_vad()
 
 model = whisper.load_model("tiny")
 
-#--------------------------- PARAMETROS CONFIGURABLES ------------------------------------------------
 
-def vad_audio_splitter(path_audio_in, path_folder_out, max_duracion, min_duracion):
+def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
     """Separa un audio en segmentos de duración entre una duración mínima y máxima de acuerdo
     a la detección de actividad de voces del VAD.
 
     Args:
-        path_audio_in (str): Path del audio de entrada a separar
+        path (str): Path del audio de entrada a separar
         path_folder_out (str): Path de la carpeta de salida donde se van a colocar los subcarpetas
-        max_duracion (int): Cantidad mínima de duración de los segmentos en segundos 
-        min_duracion (int): Cantidad máxima de duración de los segmentos en segundos
+        min_duracion (int): Cantidad mínima de duración de los segmentos en segundos. Default 15
+        max_duracion (int): Cantidad máxima de duración de los segmentos en segundos. Default 30
     """
-    # Ruta del archivo de audio
-    path=r"VAD-FINAL/Oficial gordillo.wav" 
 
+    #--------------------------- PARAMETROS CONFIGURABLES ------------------------------------------------
     # Escoge el método de optimización (puedes cambiar esta variable rápidamente)
     method = "tpe"  # Cambia a "random", "grid", "tpe".
 
@@ -214,13 +212,7 @@ def vad_audio_splitter(path_audio_in, path_folder_out, max_duracion, min_duracio
         "min_silence_duration_ms": [50, 100, 200],
     }
 
-    #Defino los limites para la duracion de los chunks
-    max_duracion= 30 # en segundos
-    min_duracion= 15 # en segundos
-
     n_trials = 10  # Cambia el número de pruebas
-
-    output_folder="chunks_VAD"
 
     #-------------------------------------------------------------------------------------------------------
 
@@ -268,4 +260,4 @@ def vad_audio_splitter(path_audio_in, path_folder_out, max_duracion, min_duracio
     if os.path.exists("converted_audio.wav"):
         os.remove("converted_audio.wav")
 
-    split_audio_chunks(path,resultados_finales,output_folder,gap=0,offset=0,tmax=max_duracion,tmin=min_duracion)
+    split_audio_chunks(path,resultados_finales,path_folder_out,gap=0,offset=0,tmax=max_duracion,tmin=min_duracion)
