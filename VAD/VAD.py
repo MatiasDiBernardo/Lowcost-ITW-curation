@@ -192,70 +192,80 @@ model = whisper.load_model("tiny")
 
 #--------------------------- PARAMETROS CONFIGURABLES ------------------------------------------------
 
-# Ruta del archivo de audio
-path=r"VAD-FINAL/Oficial gordillo.wav" 
+def vad_audio_splitter(path_audio_in, path_folder_out, max_duracion, min_duracion):
+    """Separa un audio en segmentos de duración entre una duración mínima y máxima de acuerdo
+    a la detección de actividad de voces del VAD.
 
-# Escoge el método de optimización (puedes cambiar esta variable rápidamente)
-method = "tpe"  # Cambia a "random", "grid", "tpe".
+    Args:
+        path_audio_in (str): Path del audio de entrada a separar
+        path_folder_out (str): Path de la carpeta de salida donde se van a colocar los subcarpetas
+        max_duracion (int): Cantidad mínima de duración de los segmentos en segundos 
+        min_duracion (int): Cantidad máxima de duración de los segmentos en segundos
+    """
+    # Ruta del archivo de audio
+    path=r"VAD-FINAL/Oficial gordillo.wav" 
 
-# Si se selecciona grid se debe cargar los valores para la grilla
-grid={ "threshold": [0.3, 0.5, 0.7], 
-      "min_speech_duration_ms": [50, 100, 200],
-      "min_silence_duration_ms": [50, 100, 200],
-}
+    # Escoge el método de optimización (puedes cambiar esta variable rápidamente)
+    method = "tpe"  # Cambia a "random", "grid", "tpe".
 
-#Defino los limites para la duracion de los chunks
-max_duracion= 30 # en segundos
-min_duracion= 15 # en segundos
+    # Si se selecciona grid se debe cargar los valores para la grilla
+    grid={ "threshold": [0.3, 0.5, 0.7], 
+        "min_speech_duration_ms": [50, 100, 200],
+        "min_silence_duration_ms": [50, 100, 200],
+    }
 
-n_trials = 10  # Cambia el número de pruebas
+    #Defino los limites para la duracion de los chunks
+    max_duracion= 30 # en segundos
+    min_duracion= 15 # en segundos
 
-output_folder="chunks_VAD"
+    n_trials = 10  # Cambia el número de pruebas
 
-#-------------------------------------------------------------------------------------------------------
+    output_folder="chunks_VAD"
 
-
-audio, sr = librosa.load(path, sr=None)  # Carga el audio con su frecuencia de muestreo original
-total_time = len(audio) / sr  # Duración total del audio en segundos
-result = model.transcribe(path, language="es", task="transcribe")
-
-audio_categorizado=classify_segments_by_speed(result)
-
-menor_speed=get_lowest_speed_category(audio_categorizado)
-
-load_to_wav(path)
-wav = read_audio(r'converted_audio.wav')
-
-# Selecciona los parametros de acuerdo con lo ingresado
-param_config=parametros(menor_speed)
-
-# Selecciona el sampler
-sampler = get_sampler(method, grid)
-
-study = optuna.create_study(directions=["maximize"], sampler=sampler)
-
-# Optimizar usando el diccionario de configuración
-study.optimize(lambda trial: objective(trial, param_config,wav), n_trials)
+    #-------------------------------------------------------------------------------------------------------
 
 
-print(f"Método de optimización utilizado: {method}")
+    audio, sr = librosa.load(path, sr=None)  # Carga el audio con su frecuencia de muestreo original
+    total_time = len(audio) / sr  # Duración total del audio en segundos
+    result = model.transcribe(path, language="es", task="transcribe")
 
-split_audio_chunks(path,best_speech_timestamps,output_folder="audio_chunks_parciales")
+    audio_categorizado=classify_segments_by_speed(result)
 
-seg_re_clasificar=categorize_and_filter_segments(best_speech_timestamps,audio_categorizado["segments"],menor_speed)
+    menor_speed=get_lowest_speed_category(audio_categorizado)
 
-original_best_speech_timestamps = best_speech_timestamps.copy()
+    load_to_wav(path)
+    wav = read_audio(r'converted_audio.wav')
 
-reusltados_re_clasificados=process_audio_chunks(seg_re_clasificar,path)
+    # Selecciona los parametros de acuerdo con lo ingresado
+    param_config=parametros(menor_speed)
 
-resultados_finales=extract_and_sort_timestamps(reusltados_re_clasificados)
+    # Selecciona el sampler
+    sampler = get_sampler(method, grid)
 
-# borro los chunks parciales
-if os.path.exists("audio_chunks_parciales"):
-    shutil.rmtree("audio_chunks_parciales")
+    study = optuna.create_study(directions=["maximize"], sampler=sampler)
 
-# borro el converted audio
-if os.path.exists("converted_audio.wav"):
-    os.remove("converted_audio.wav")
+    # Optimizar usando el diccionario de configuración
+    study.optimize(lambda trial: objective(trial, param_config,wav), n_trials)
 
-split_audio_chunks(path,resultados_finales,output_folder,gap=0,offset=0,tmax=max_duracion,tmin=min_duracion)
+
+    print(f"Método de optimización utilizado: {method}")
+
+    split_audio_chunks(path,best_speech_timestamps,output_folder="audio_chunks_parciales")
+
+    seg_re_clasificar=categorize_and_filter_segments(best_speech_timestamps,audio_categorizado["segments"],menor_speed)
+
+    original_best_speech_timestamps = best_speech_timestamps.copy()
+
+    reusltados_re_clasificados=process_audio_chunks(seg_re_clasificar,path)
+
+    resultados_finales=extract_and_sort_timestamps(reusltados_re_clasificados)
+
+    # borro los chunks parciales
+    if os.path.exists("audio_chunks_parciales"):
+        shutil.rmtree("audio_chunks_parciales")
+
+    # borro el converted audio
+    if os.path.exists("converted_audio.wav"):
+        os.remove("converted_audio.wav")
+
+    split_audio_chunks(path,resultados_finales,output_folder,gap=0,offset=0,tmax=max_duracion,tmin=min_duracion)
