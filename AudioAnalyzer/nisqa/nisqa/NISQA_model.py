@@ -17,7 +17,13 @@ import torch.nn as nn
 from torch import optim
 from torch.utils.data import DataLoader
 from . import NISQA_lib as NL
-        
+
+VERBOSE = True
+
+def set_verbose(v):
+    global VERBOSE
+    VERBOSE = v
+
 class nisqaModel(object):
     '''
     nisqaModel: Main class that loads the model and the datasets. Contains
@@ -52,7 +58,9 @@ class nisqaModel(object):
             self._evaluate_mos(mapping=mapping, do_print=do_print, do_plot=do_plot)      
             
     def predict(self):
-        print('---> Predicting ...')
+        if VERBOSE:
+            print('---> Predicting ...')
+
         if self.args['tr_parallel']:
             self.model = nn.DataParallel(self.model)           
         
@@ -76,8 +84,10 @@ class nisqaModel(object):
             self.ds_val.df.to_csv(
                 os.path.join(self.args['output_dir'], 'NISQA_results.csv'), 
                 index=False)
+
+        if VERBOSE:
+            print(self.ds_val.df.to_string(index=False))
             
-        print(self.ds_val.df.to_string(index=False))
         return self.ds_val.df
 
     def _train_mos(self):
@@ -749,7 +759,8 @@ class nisqaModel(object):
         files = [os.path.basename(files) for files in files]
         df_val = pd.DataFrame(files, columns=['deg'])
      
-        print('# files: {}'.format( len(df_val) ))
+        if VERBOSE:
+            print('# files: {}'.format( len(df_val) ))
         if len(df_val)==0:
             raise ValueError('No wav files found in data_dir')   
         
@@ -1015,7 +1026,7 @@ class nisqaModel(object):
                 'de_fuse': self.args['de_fuse'],        
                 })
                       
-        print('Model architecture: ' + self.args['model'])
+        # print('Model architecture: ' + self.args['model'])
         if self.args['model']=='NISQA':
             self.model = NL.NISQA(**self.model_args)     
         elif self.args['model']=='NISQA_DIM':
@@ -1028,7 +1039,8 @@ class nisqaModel(object):
         # Load weights if pretrained model is used ------------------------------------
         if self.args['pretrained_model']:
             missing_keys, unexpected_keys = self.model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-            print('Loaded pretrained model from ' + self.args['pretrained_model'])
+            if VERBOSE:
+                print('Loaded pretrained model from ' + self.args['pretrained_model'])
             if missing_keys:
                 print('missing_keys:')
                 print(missing_keys)
@@ -1050,7 +1062,8 @@ class nisqaModel(object):
                 self.dev = torch.device("cpu")
             elif self.args['tr_device']=='cuda':
                 self.dev = torch.device("cuda")
-        print('Device: {}'.format(self.dev))
+        if VERBOSE:
+            print('Device: {}'.format(self.dev))
         
         if "tr_parallel" in self.args:
             if (self.dev==torch.device("cpu")) and self.args['tr_parallel']==True:
