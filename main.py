@@ -1,7 +1,7 @@
 from STT.whisper import stt_whisper
 from AudioAnalyzer.NISQA import run_audio_predict
 from Denoising.deep_net import denoise_deep_net
-from VAD.vad import vad_audio_splitter 
+from VAD.VAD import vad_audio_splitter 
 
 import os
 import shutil

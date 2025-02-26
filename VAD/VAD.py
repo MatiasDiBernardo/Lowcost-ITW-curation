@@ -10,6 +10,9 @@ from VAD.auxiliares import load_to_wav, split_audio_chunks, extract_and_sort_tim
 from VAD.clasificador_wps import categorize_and_filter_segments,classify_segments_by_speed,get_lowest_speed_category
 from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
 import optuna
+import logging
+
+optuna.logging.set_verbosity(logging.WARNING)  # Oculta INFO y DEBUG
 
 
 # Variables globales para almacenar los mejores resultados
@@ -95,7 +98,7 @@ def parametros(vel):
     return param_config
 
 
-def process_audio_chunks(audio_dict,audio_file):
+def process_audio_chunks(audio_dict,audio_file,n_trials,sampler):
     """
     Procesa los audios según las categorías y guarda los resultados en un diccionario,
     ajustando los límites temporales para que respeten el audio original.
@@ -131,9 +134,9 @@ def process_audio_chunks(audio_dict,audio_file):
             audio_path = f"audio_chunks_parciales/{audio_filename}"
 
             # Verificar que el índice sea válido en `original_best_speech_timestamps`
-            if index >= len(original_best_speech_timestamps):
-                print(f"Advertencia: El índice {index} excede el rango de `original_best_speech_timestamps`. Saltando...")
-                continue
+            #if index >= len(original_best_speech_timestamps):
+            #    print(f"Advertencia: El índice {index} excede el rango de `original_best_speech_timestamps`. Saltando...")
+            #    continue
 
             # Obtener el tiempo inicial y final del segmento en el audio original
             original_segment = original_best_speech_timestamps[index]
@@ -151,18 +154,19 @@ def process_audio_chunks(audio_dict,audio_file):
             best_speech_timestamps = None
 
 
-            print("---------------------------------------------------------------------------------------")
-            print("Optimizando audio", audio_filename, "en velocidad", category)
-            print(audio_path)
+            #print("---------------------------------------------------------------------------------------")
+            #print("Optimizando audio", audio_filename, "en velocidad", category)
+            #print(audio_path)
             
             # Crear el objeto optuna study
             study = optuna.create_study(directions=["maximize"], sampler=sampler)
 
             # Ejecutar la optimización
+            # n_trials=10
             study.optimize(lambda trial: objective(trial, param_config, wav), n_trials)
 
-            print("Marcas de tiempo del los segmentos")
-            print(best_speech_timestamps)
+            #print("Marcas de tiempo del los segmentos")
+            #print(best_speech_timestamps)
 
             # Ajustar los límites temporales para que respeten el tiempo original
             adjusted_timestamps = [
@@ -174,8 +178,8 @@ def process_audio_chunks(audio_dict,audio_file):
                 for start, end in [segment.values()]
             ]
 
-            print("Marcas de tiempo relativas al Audio original")
-            print(adjusted_timestamps)
+            #print("Marcas de tiempo relativas al Audio original")
+            #print(adjusted_timestamps)
 
             # Guardar el resultado ajustado en el diccionario
             audio_key = f"audio_{audio_number:02d}"  # Clave del resultado
@@ -192,6 +196,8 @@ model = whisper.load_model("tiny")
 
 
 def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
+
+    global best_speech_timestamps, best_score, original_best_speech_timestamps
     """Separa un audio en segmentos de duración entre una duración mínima y máxima de acuerdo
     a la detección de actividad de voces del VAD.
 
@@ -240,7 +246,7 @@ def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
     study.optimize(lambda trial: objective(trial, param_config,wav), n_trials)
 
 
-    print(f"Método de optimización utilizado: {method}")
+    #print(f"Método de optimización utilizado: {method}")
 
     split_audio_chunks(path,best_speech_timestamps,output_folder="audio_chunks_parciales")
 
@@ -248,7 +254,7 @@ def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
 
     original_best_speech_timestamps = best_speech_timestamps.copy()
 
-    reusltados_re_clasificados=process_audio_chunks(seg_re_clasificar,path)
+    reusltados_re_clasificados=process_audio_chunks(seg_re_clasificar,path,n_trials,sampler)
 
     resultados_finales=extract_and_sort_timestamps(reusltados_re_clasificados)
 
@@ -261,3 +267,5 @@ def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
         os.remove("converted_audio.wav")
 
     split_audio_chunks(path,resultados_finales,path_folder_out,gap=0,offset=0,tmax=max_duracion,tmin=min_duracion)
+
+

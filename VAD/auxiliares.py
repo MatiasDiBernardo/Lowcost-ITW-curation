@@ -25,10 +25,8 @@ def load_to_wav(audio_path,output_path = "converted_audio.wav"):
 
     # Exportar archivo convertido
     audio.export(output_path, format="wav")
-    print(f"Archivo convertido con éxito: {output_path}")
+    #print(f"Archivo convertido con éxito: {output_path}")
 
-
-import shutil
 
 def split_audio_chunks(audio_file, timestamps, output_folder, tmin=0, tmax=9999, gap=0, offset=0):
     """
@@ -78,8 +76,8 @@ def split_audio_chunks(audio_file, timestamps, output_folder, tmin=0, tmax=9999,
         # Verificar si ya superamos tmin
         if current_duration >= tmin:
             # Si tmax está definido y lo superamos, guardamos el fragmento actual y empezamos uno nuevo
-            if tmax is not None and current_duration > tmax:
-                print(f"⚠️ Advertencia: Un segmento combinado alcanzó {current_duration:.2f}s, mayor a tmax={tmax}s. Se guarda sin recortar.")
+            #if tmax is not None and current_duration > tmax:
+            #   print(f"⚠️ Advertencia: Un segmento combinado alcanzó {current_duration:.2f}s, mayor a tmax={tmax}s. Se guarda sin recortar.")
             combined_chunks.append(current_chunk)
 
             # Reiniciar el acumulador
@@ -97,7 +95,7 @@ def split_audio_chunks(audio_file, timestamps, output_folder, tmin=0, tmax=9999,
         chunk_path = os.path.join(output_folder, chunk_name)
         chunk.export(chunk_path, format="wav")
 
-    print(f"✅ Se guardaron {len(combined_chunks)} fragmentos en {output_folder}.")
+    #print(f"✅ Se guardaron {len(combined_chunks)} fragmentos en {output_folder}.")
 
 
 
@@ -122,3 +120,4 @@ def extract_and_sort_timestamps(audio_dict):
         timestamps.extend(segments)
 
     return timestamps
+
