@@ -1,64 +1,49 @@
-from STT.whisper import stt_whisper
-from AudioAnalyzer.NISQA import run_audio_predict
-from Denoising.deep_net import denoise_deep_net
-from VAD.VAD import vad_audio_splitter 
+from main_sections import *
 
 import os
-import shutil
 
-# Env Var
-TEST = True
-VERBOSE = True
+# Config data flow (si se aplica o no estos procesos en la cadena)
+config_flow = {"denoising": True, "cleaning": True}
 
-# From: Audio_to_Process -> Audios_Raw
-## Normalizando nomenclatura de los datos y verificar que metadata este actualizado
-process_path = "Datos/Audio_to_Process"
-raw_path = "Datos/Audios_Raw"
-
-audios_to_process = os.listdir(process_path)
-for audio in audios_to_process:
-
-    if TEST:
-        shutil.move(os.path.join(process_path, audio), os.path.join(raw_path, audio))
-
-# From: Audios_Raw -> Audios_Denoise
-## Agrega denoise a todo el audio
-raw_path = os.path.join("Datos", "Audios_Raw")
-denoise_path = os.path.join("Datos", "Audios_Denoise") 
-denoise_deep_net(raw_path, denoise_path)
-
-# From: Audios_Denoise -> Audios VAD
-## Separa los audios largos en chunks
-denoise_path = os.path.join("Datos", "Audios_Denoise")
-vad_path = os.path.join("Datos", "Audios_VAD") 
-
-audios_to_split = os.listdir(denoise_path)
-for audio in audios_to_split:
-    name = audio.split(".")[0]
-    folder_ouput_vad = os.path.join(vad_path, name)
-    os.mkdir(folder_ouput_vad)
-    vad_audio_splitter(os.path.join(denoise_path, audio), folder_ouput_vad)
-
-# From: Audios_VAD -> Audios_Clean
-## Elimina audios nos deseados
-vad_path = os.path.join("Datos", "Audios_VAD") 
-clean_audios_path = os.path.join("Datos", "Audios_Clean") 
-
-folders_vad = os.listdir(vad_path)
-for folder in folders_vad:
-
-    chunk_audios = os.listdir(os.path.join(vad_path, folder))
-    os.makedirs(os.path.join(clean_audios_path, folder), exist_ok=True)  # Crea la subcarpeta en el destino
-
-    for path_chunk in chunk_audios:
-        ## Si el AudioAnalyzer considera que el audio es aceptable
-        if run_audio_predict(path_chunk):
-            folder_input = os.path.join(vad_path, folder, path_chunk)
-            folder_dest = os.path.join(clean_audios_path, folder, path_chunk)
-            shutil.move(folder_input, folder_dest)
+def automatic_dataset_generator(config):
+    # Siempre empieza en Audios to Process 
+    process_path = os.path.join("Datos", "Audio_to_Process") 
+    audios_to_process = os.listdir(process_path)
+    
+    # Para codear esto bien tendría que plantear la lógica de los if como un árbol (no tengo ganas)
+    audio_processing(audios_to_process)
+    
+    # Brancheo para poder hacer diferentes configuraciones
+    if config["denoising"]:
+        audio_denoise(audios_to_process)
+        audio_vad(audios_to_process, "Audios_Denoise")
+        if config["cleaning"]:
+            audio_clean(audios_to_process)
+            audio_transcript(audios_to_process, "Audios_Clean")
+            audio_transcript_to_dataset(audios_to_process)
         else:
-            # Agregar a la carpeta de remove
-            if VERBOSE:
-                print(f"Se descartó el audio {path_chunk}")
+            audio_transcript(audios_to_process, "Audios_VAD")
+            audio_transcript_to_dataset(audios_to_process)
+    else:
+        audio_vad(audios_to_process, "Audios_Raw")
+        if config["cleaning"]:
+            audio_clean(audios_to_process)
+            audio_transcript(audios_to_process, "Audios_Clean")
+            audio_transcript_to_dataset(audios_to_process)
+        else:
+            audio_transcript(audios_to_process, "Audios_VAD")
+            audio_transcript_to_dataset(audios_to_process)
 
-# From: Audios_Clean -> Audios_Transcript
+def simple_direct_implementation():
+    process_path = os.path.join("Datos", "Audio_to_Process") 
+    audios_to_process = os.listdir(process_path)
+    
+    audio_processing(audios_to_process)
+    audio_denoise(audios_to_process)
+    audio_vad(audios_to_process, "Audios_Denoise")
+    audio_clean(audios_to_process)
+    audio_transcript(audios_to_process, "Audios_Clean")
+    audio_transcript_to_dataset(audios_to_process)
+
+if __name__ == "__main__":
+    automatic_dataset_generator(config_flow)
