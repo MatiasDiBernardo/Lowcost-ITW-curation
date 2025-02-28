@@ -92,13 +92,21 @@ Para el código, cada función que sea medianamente relevante tiene que tener su
 
 ## Validación y Testeo
 Hay que definir audios de prueba los cuales se va a evaluar a mano el funcionamiento deseado y se va a contrastar el ideal con respecto a los resultados generados por la cadena. Por ejemplo, se determina que tiene que haber 30 segmentos de VAD, 24 segmentos después del AA, 22 segmentos después del FD y 18 segmentos después del STT.
+
 Evidentemente cada parte de la cadena depende de la etapa anterior, así que abría que buscar la manera de realizar los test para que depende lo menos posible de las etapas anteriores.
 
-Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Ejemplo
-1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar X segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*
+Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Si encuentran audios que estan buenos para el testeo subanlos al drive y pongan una breve explicación de cual es el comportamiento esperado de la cadena frente a ese estímulo.
+
+1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar 7 segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*.
+2) Test2: Audio con mala calidad y ruido de fondo y no se entiende lo que dicen. En la etapa de *Preparar Datos* el VAD tiene que generar 2 segmentos. Todos los segmentos se deberían eliminar en la etapa de *Limpiar Datos*.
 
 **Links** 
 
 [Carpeta dataset TEST](https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing)
 
 Cuando arranquemos completo con el otro link
+
+Para probar diferentes configuraciones y poder volver atrás, hice un script para volver a mover los audios seleccionados a "Audios_to_Process" y poder volver a hacer pruebas e ir iternado sobre la cadena de forma sencilla. El script es encuentra en `Utils/reset_conditions.py` donde tiene que completar que audios resetear en las primeras líneas de código.
+
+## Ejecución del programa
+La cadena de procesos se ejecuta de manera conjunta en `main.py`, dentro de este archivo se puede configurar para salter la etapa de **Denoising** (implica no pasar por el denoising) o la etapa de **Cleaning** (implica no pasar por el AudioAnalyzer para filtrar audios).
