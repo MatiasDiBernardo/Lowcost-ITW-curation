@@ -266,6 +266,6 @@ def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
     if os.path.exists("converted_audio.wav"):
         os.remove("converted_audio.wav")
 
-    split_audio_chunks(path,resultados_finales,path_folder_out,gap=0,offset=0,tmax=max_duracion,tmin=min_duracion,extend_silence=True)
+    split_audio_chunks(path,resultados_finales,path_folder_out,mean_duration=15,std_duration=5,use_normal_distribution=True,extend_silence=True)
 
 

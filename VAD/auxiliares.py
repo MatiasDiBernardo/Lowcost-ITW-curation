@@ -1,7 +1,7 @@
 import os
 from pydub import AudioSegment
 import shutil
-
+import numpy as np
 
 def load_to_wav(audio_path,output_path = "converted_audio.wav"):
     # Convertir ruta a absoluta para evitar problemas con rutas relativas
@@ -28,20 +28,21 @@ def load_to_wav(audio_path,output_path = "converted_audio.wav"):
     #print(f"Archivo convertido con éxito: {output_path}")
 
 
-def split_audio_chunks(audio_file, timestamps, output_folder, tmin=0, tmax=9999, gap=0, offset=0, extend_silence=False):
+def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, std_duration=5, gap=0, offset=0, extend_silence=False, use_normal_distribution=False):
     """
-    Divide un archivo de audio en fragmentos basados en los tiempos dados y ajusta su duración
-    combinando fragmentos cortos hasta alcanzar tmin y asegurando que no superen tmax.
+    Divide un archivo de audio en fragmentos basados en los tiempos dados y ajusta su duración.
+    Puede seguir una distribución normal de duración objetivo si se habilita la opción.
     
     Args:
         audio_file (str): Ruta del archivo de audio original.
         timestamps (list): Lista de diccionarios con los tiempos de inicio y fin en segundos.
         output_folder (str): Carpeta donde se guardarán los fragmentos.
-        tmin (int): Duración mínima en segundos de un fragmento resultante.
-        tmax (int | None): Duración máxima en segundos de un fragmento resultante. Si es None, no hay límite.
+        mean_duration (int): Duración media deseada para los fragmentos en segundos.
+        std_duration (int): Desviación estándar de la duración de los fragmentos en segundos.
         gap (int): Tiempo adicional en milisegundos a agregar antes y después de cada fragmento.
         offset (int): Número inicial para nombrar los fragmentos.
         extend_silence (bool): Si es True, distribuye el silencio entre los segmentos consecutivos.
+        use_normal_distribution (bool): Si es True, usa una distribución normal para definir la duración de los chunks.
     """
 
     formato = audio_file[-3:].lower()
@@ -80,33 +81,34 @@ def split_audio_chunks(audio_file, timestamps, output_folder, tmin=0, tmax=9999,
         adjusted_timestamps = timestamps
 
     combined_chunks = []
-    current_chunk = AudioSegment.silent(duration=0)  # Inicialmente vacío
-    current_duration = 0
+    if use_normal_distribution:
+        current_chunk = AudioSegment.silent(duration=0)
+        current_duration = 0
+        target_duration = max(1, np.random.normal(mean_duration, std_duration))  # Generar la primera duración objetivo
 
-    for ts in adjusted_timestamps:
-        start_ms = int(ts['start'] * 1000)  # Convertir segundos a milisegundos
-        end_ms = int(ts['end'] * 1000)      # Convertir segundos a milisegundos
-        segment = audio[start_ms - gap:end_ms + gap]
-        segment_duration = len(segment) / 1000  # Convertir a segundos
+        for ts in adjusted_timestamps:
+            start_ms = int(ts['start'] * 1000)
+            end_ms = int(ts['end'] * 1000)
+            segment = audio[start_ms - gap:end_ms + gap]
+            segment_duration = len(segment) / 1000
 
-        # Agregar el fragmento al chunk actual
-        current_chunk += segment
-        current_duration += segment_duration
+            current_chunk += segment
+            current_duration += segment_duration
 
-        # Verificar si ya superamos tmin
-        if current_duration >= tmin:
-            # Si tmax está definido y lo superamos, guardamos el fragmento actual y empezamos uno nuevo
-            if tmax is not None and current_duration > tmax:
-                print(f"⚠️ Advertencia: Un segmento combinado alcanzó {current_duration:.2f}s, mayor a tmax={tmax}s. Se guarda sin recortar.")
+            if current_duration >= target_duration:
+                combined_chunks.append(current_chunk)
+                current_chunk = AudioSegment.silent(duration=0)
+                current_duration = 0
+                target_duration = max(1, np.random.normal(mean_duration, std_duration))
+
+        if current_duration > 0:
             combined_chunks.append(current_chunk)
-
-            # Reiniciar el acumulador
-            current_chunk = AudioSegment.silent(duration=0)
-            current_duration = 0
-
-    # Agregar el último fragmento si quedó algo sin guardar
-    if current_duration > 0:
-        combined_chunks.append(current_chunk)
+    else:
+        for ts in adjusted_timestamps:
+            start_ms = int(ts['start'] * 1000)
+            end_ms = int(ts['end'] * 1000)
+            segment = audio[start_ms - gap:end_ms + gap]
+            combined_chunks.append(segment)
 
     # Exportar los fragmentos
     for i, chunk in enumerate(combined_chunks):
