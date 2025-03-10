@@ -12,7 +12,7 @@ def tiempo_chunks(path_audio):
 
 def test_chunks_track1():
     name_track = "Test1"  # Sin file extension
-    chunk_target = 7  # Cantidad de chunks esperada
+    chunk_target = 8  # Cantidad de chunks esperada
 
     chunk_real = len(os.listdir(os.path.join("Datos", "Audios_VAD", name_track)))  # Cantidad de chunks real
     
@@ -20,7 +20,7 @@ def test_chunks_track1():
 
 def test_time_track1():
     name_track = "Test1.wav"  # Con file extension
-    max_time_diff = 70  # Máxima diferencia de tiempo entre audio original y VAD en segundos 
+    max_time_diff = 1  # Máxima diferencia de tiempo entre audio original y VAD en segundos 
 
     # Duración de los segmentos similar a la original 
     path_base = os.path.join("Datos", "Audios_VAD", name_track.split(".")[0])
@@ -33,7 +33,7 @@ def test_time_track1():
 
 def test_chunks_track2():
     name_track = "Test2"  # Sin file extension
-    chunk_target = 2  # Cantidad de chunks esperada
+    chunk_target = 3  # Cantidad de chunks esperada
 
     chunk_real = len(os.listdir(os.path.join("Datos", "Audios_VAD", name_track)))  # Cantidad de chunks real
     
@@ -41,7 +41,7 @@ def test_chunks_track2():
     
 def test_time_track2():
     name_track = "Test2.wav"  # Con file extension
-    max_time_diff = 30  # Máxima diferencia de tiempo entre audio original y VAD en segundos 
+    max_time_diff = 3  # Máxima diferencia de tiempo entre audio original y VAD en segundos 
 
     # Duración de los segmentos similar a la original 
     path_base = os.path.join("Datos", "Audios_VAD", name_track.split(".")[0])
