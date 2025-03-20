@@ -4,11 +4,10 @@ Este repositorio contiene un algoritmo que permite identificar las mejores secci
 1. [Estructura del código](#code_est)
 2. [Orden de la cadena](#orden)
 3. [Dependencias](#dependecias)
-3. [Formato de audio](#formato)
-3. [Estilo de código](#estilo)
-3. [Testing](#testing)
-3. [Dataset](#dataset)
-3. [Ejecución](#ejecucion)
+4. [Estilo de código](#estilo)
+5. [Testing](#testing)
+6. [Dataset](#dataset)
+7. [Ejecución](#ejecucion)
 
 ## Estructura código <a name="code_est"></a>
 ### Carpetas con datos
@@ -92,13 +91,12 @@ sudo apt update && sudo apt install ffmpeg
 # on Windows using Chocolatey (https://chocolatey.org/)
 choco install ffmpeg
 ```
-## Formato de los audios <a name="formato"></a>
-Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100 Hz**. En Utils hay (que hacer) una función para normalizar los audios a este formato. No tiene sentido usar `WAV` si vamos a sacar audios de internet, pero si en la cadena de procesas necesitan ingresar con `WAV` tienen que realizar la conversión, procesar y después guardar en el formato especificado.
-
 ## Estilo del código <a name="estilo"></a>
 Para los commits pueden tener su branch y hacer pull request para subir sus cambios o pueden directamente trabajar todo en main, eso no me importa. Lo que si traten de ser descriptivos con los commits y tratar de que sean cambios chicos así es más fácil de trackear.
 
 Para el código, cada función que sea medianamente relevante tiene que tener su doc string con la funcionalidad general y la especificación de los parámetros de entrada y salida con el tipo y descripción.
+
+Todo parámetro importante para el funcionamiento del algoritmo tiene que ser configurable. La idea es poder tener esas variables en lugares accesibles del código para poder cargar los parámetros de configuración desde el archivo de configuración y abstraer la complejidad de cada proceso de la etapa a una serie de parámetros. 
 
 ## Testing <a name="testing"></a>
 Hay que definir audios de prueba los cuales se va a evaluar a mano el funcionamiento deseado y se va a contrastar el ideal con respecto a los resultados generados por la cadena. Por ejemplo, se determina que tiene que haber 30 segmentos de VAD, 24 segmentos después del AA, 22 segmentos después del FD y 18 segmentos después del STT.
@@ -121,15 +119,20 @@ Para probar diferentes configuraciones y poder volver atrás, hice un script par
 ## Dataset <a name="dataset"></a>
 En el dataset de test solo van los audios a testear:
 
-**Dataset testing** 
+**Dataset testing:** 
 [Carpeta dataset TEST](https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing)
 
 En el dataset general van los audios que se van a usar para entrenar el TTS. Al agregar audios a esta carpeta siempre se tiene que completar el `metadata.csv` con la información asociada a el audio que se agrega (detallado en la sección de archivos principales).
 
-**Dataset** 
+**Dataset:** 
 [Carpeta dataset](https://drive.google.com/drive/folders/1jvcYoEdATE2a6a1ftDe_EO3trm2FCCt8?usp=sharing)
 
 Mi idea después es tener siempre macheado los datos en local y en drive para tener un backup.
+
+### Formato del audio
+Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100 Hz**. En Utils hay (que hacer) una función para normalizar los audios a este formato. No tiene sentido usar `WAV` si vamos a sacar audios de internet, pero si en la cadena de procesas necesitan ingresar con `WAV` tienen que realizar la conversión, procesar y después guardar en el formato especificado.
+
+En la carpeta "Audios_to_Process" se pueden poner cualquier tipo de formato (o que soporte PyDub en realidad). Ya que dentro de la cadena se hace la conversión al formato específicado cuando pasa a "Audios_Raw".
 
 ## Ejecución del programa <a name="ejecucion"></a>
 La cadena de procesos se ejecuta de manera conjunta en `main.py`, dentro de este archivo se puede configurar para salter la etapa de **Denoising** (implica no pasar por el denoising) o la etapa de **Cleaning** (implica no pasar por el AudioAnalyzer para filtrar audios).
