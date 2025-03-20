@@ -18,7 +18,10 @@ from torch import optim
 from torch.utils.data import DataLoader
 from . import NISQA_lib as NL
 
-VERBOSE = True
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+VERBOSE = config["verbose"]
 
 def set_verbose(v):
     global VERBOSE

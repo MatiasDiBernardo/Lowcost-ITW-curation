@@ -1,10 +1,14 @@
 import os
-from pydub import AudioSegment
+import yaml
 import shutil
 import numpy as np
+from pydub import AudioSegment
 
-TEST = True
-VERBOSE = False
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+TEST = config["test"]
+VERBOSE = config["verbose"]
 
 def load_to_wav(audio_path,output_path = "converted_audio.wav"):
     # Convertir ruta a absoluta para evitar problemas con rutas relativas
@@ -148,4 +152,3 @@ def extract_and_sort_timestamps(audio_dict):
         timestamps.extend(segments)
 
     return timestamps
-

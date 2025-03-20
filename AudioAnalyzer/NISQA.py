@@ -2,14 +2,21 @@ from AudioAnalyzer.nisqa.nisqa.NISQA_model import nisqaModel, set_verbose
 
 import os
 import librosa
+import yaml
 from glob import glob
 
+# Carga configuración
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+nisqa_config = config["nisqa"]
+
 OUTPUT_DIR = ''  # Si se le asigna valor, graba un csv con los resultados de NISQA en la ruta que se le pase.
-THRESHOLD = 4
-MAX_SECONDS = 40.0
-MIN_SECONDS = 8.0
-NUM_WORKERS = 0
-BATCH_SIZE = 10
+THRESHOLD = nisqa_config["threshold"]
+MAX_SECONDS = nisqa_config["max_seconds"]
+MIN_SECONDS = nisqa_config["min_seconds"]
+NUM_WORKERS = nisqa_config["num_workers"]
+BATCH_SIZE = nisqa_config["batch_size"]
 
 
 def run_folder_predict(input_dir: str, output_dir: str = OUTPUT_DIR, num_workers: int = NUM_WORKERS, batch_size: str = BATCH_SIZE, ms_channel: str = None, verbose = False):

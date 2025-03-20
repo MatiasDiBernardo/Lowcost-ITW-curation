@@ -1,0 +1,17 @@
+# Global
+test: true
+verbose: false 
+
+# Nisca
+nisqa:
+  threshold: 3.8
+  max_seconds: 40.0
+  min_seconds: 8.0
+  num_workers: 0
+  batch_size: 10
+
+# VAD
+
+  
+
+

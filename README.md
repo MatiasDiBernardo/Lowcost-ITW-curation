@@ -1,7 +1,16 @@
 # ASR Dataset Generator
 Este repositorio contiene un algoritmo que permite identificar las mejores secciones de un audio de gran duración. Esto permite generar dataset de mayor calidad para utilizar en diferentes tareas de ASR.
 
-## Organización estructura código
+1. [Estructura del código](#code_est)
+2. [Orden de la cadena](#orden)
+3. [Dependencias](#dependecias)
+3. [Formato de audio](#formato)
+3. [Estilo de código](#estilo)
+3. [Testing](#testing)
+3. [Dataset](#dataset)
+3. [Ejecución](#ejecucion)
+
+## Estructura código <a name="code_est"></a>
 ### Carpetas con datos
 Este es el nombre y función de las carpetas donde se van a almacenar los datos, se tienen que crear para poder ejecutar `main.py`. Están ocultas por git para no trackear datos. Con el archivo `Utils/create_folder_estructure.py` se pueden crear todas las carpetas de forma automática. Todas las carpetas listadas a continuación están dentro de la carpetas *Datos*.
 
@@ -57,18 +66,19 @@ Estos archivos se encuentran en el directorio principal:
     * Audios_VAD (int): Número de segmentos que genero el VAD. Se completa después automáticamente
     * Audios_Clean (int): Número de audios que pasaron AA y FD. Se completa después automáticamente
     * Audios_Transcript(int): Número de audios con transcripción aceptable. Se completa después automáticamente
+- `config.yaml`': Archivo de configuración con los parámetros más importantes de todas las etapas
 - `transcript.csv`: El resultado con el path a los mejores audios y su transcripción. Es la combinación de los transcripts individuales de cada fuente de audio 
 - `requirements.txt`': Dependencias del proyecto, separadas por sub modulo
 - `main.py`: Ejecuta toda la cadena de procesos, desde "Audios to Process" a "Audios Transcript" 
 
-## Orden la cadena
+## Orden la cadena <a name="orden"></a>
 El diagrama de flujo del proceso entero es el siguiente:
 
 ![ASR Corpus Generator](Utils/assets/diagrama-algoritmo.PNG)
 
 Este repositorio contiene la funcionalidad para la etapa de *Preparar datos* y *Limpiar datos*.
 
-## Dependencias
+## Dependencias <a name="dependencias"></a>
 Vamos a hacer un environment nuevo para este proyecto, si tienen algo con pytorch o cualquier ML framework instalar las versiones para usar CPU así nos aseguramos que les puede correr a todos (avisar si no tiene versión con CPU). Estamos usando Python 3.9.1, es necesario para compatibilidad de versiones.
 
 Seguramente se repitan muchas dependencias, pongan las versiones de los paquetes necesarios para que funcione su función y vemos si funciona para todos, sino vamos debugeando. Si hay algo externo que hay que instalar para que funcione dejarlo en esta sección.
@@ -82,21 +92,22 @@ sudo apt update && sudo apt install ffmpeg
 # on Windows using Chocolatey (https://chocolatey.org/)
 choco install ffmpeg
 ```
-## Formato de los audios
+## Formato de los audios <a name="formato"></a>
 Vamos a usar formato `MP3` en lo posible a **320 Kbps** en `Mono` y a **44.100 Hz**. En Utils hay (que hacer) una función para normalizar los audios a este formato. No tiene sentido usar `WAV` si vamos a sacar audios de internet, pero si en la cadena de procesas necesitan ingresar con `WAV` tienen que realizar la conversión, procesar y después guardar en el formato especificado.
 
-## Commits y pautas del código 
-Pueden tener su branch y hacer pull request para subir sus cambios o pueden directamente trabajar todo en main, eso no me importa. Lo que si traten de ser descriptivos con los commits y tratar de que sean cambios chicos así es más fácil de trackear.
+## Estilo del código <a name="estilo"></a>
+Para los commits pueden tener su branch y hacer pull request para subir sus cambios o pueden directamente trabajar todo en main, eso no me importa. Lo que si traten de ser descriptivos con los commits y tratar de que sean cambios chicos así es más fácil de trackear.
 
 Para el código, cada función que sea medianamente relevante tiene que tener su doc string con la funcionalidad general y la especificación de los parámetros de entrada y salida con el tipo y descripción.
 
-## Validación y Testeo
+## Testing <a name="testing"></a>
 Hay que definir audios de prueba los cuales se va a evaluar a mano el funcionamiento deseado y se va a contrastar el ideal con respecto a los resultados generados por la cadena. Por ejemplo, se determina que tiene que haber 30 segmentos de VAD, 24 segmentos después del AA, 22 segmentos después del FD y 18 segmentos después del STT.
 
 Evidentemente cada parte de la cadena depende de la etapa anterior, así que abría que buscar la manera de realizar los test para que depende lo menos posible de las etapas anteriores.
 
-Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Si encuentran audios que estan buenos para el testeo subanlos al drive y pongan una breve explicación de cual es el comportamiento esperado de la cadena frente a ese estímulo.
+Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el dataset real. La idea es que en la carpeta de testeos tengamos audios específicos que sean representativos de diferentes casos. Si encuentran audios que estan buenos para el testeo subanlos al drive (link en la siguiente sección) y pongan una breve explicación de cual es el comportamiento esperado de la cadena frente a ese estímulo.
 
+### Test actuales
 1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar 7 segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*.
 2) Test2: Audio con mala calidad y ruido de fondo y no se entiende lo que dicen. En la etapa de *Preparar Datos* el VAD tiene que generar 2 segmentos. Todos los segmentos se deberían eliminar en la etapa de *Limpiar Datos*.
 3) Test3: Audio de buena calidad y con buena dicción pero con mucho reverb.
@@ -105,14 +116,22 @@ Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el datase
 6) Test6: Audio donde la persona habla lento y con una cadencia marcada.
 7) Test7: Audio con mucho clipeo y música al principio.
 
-
-**Links** 
-
-[Carpeta dataset TEST](https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing)
-
-Cuando arranquemos completo con el otro link
-
 Para probar diferentes configuraciones y poder volver atrás, hice un script para volver a mover los audios seleccionados a "Audios_to_Process" y poder volver a hacer pruebas e ir iternado sobre la cadena de forma sencilla. El script es encuentra en `Utils/reset_conditions.py` donde tiene que completar que audios resetear en las primeras líneas de código.
 
-## Ejecución del programa
+## Dataset <a name="dataset"></a>
+En el dataset de test solo van los audios a testear:
+
+**Dataset testing** 
+[Carpeta dataset TEST](https://drive.google.com/drive/folders/1_cu4lKb3mOHVO5906rWNArsNIxcxewbh?usp=sharing)
+
+En el dataset general van los audios que se van a usar para entrenar el TTS. Al agregar audios a esta carpeta siempre se tiene que completar el `metadata.csv` con la información asociada a el audio que se agrega (detallado en la sección de archivos principales).
+
+**Dataset** 
+[Carpeta dataset](https://drive.google.com/drive/folders/1jvcYoEdATE2a6a1ftDe_EO3trm2FCCt8?usp=sharing)
+
+Mi idea después es tener siempre macheado los datos en local y en drive para tener un backup.
+
+## Ejecución del programa <a name="ejecucion"></a>
 La cadena de procesos se ejecuta de manera conjunta en `main.py`, dentro de este archivo se puede configurar para salter la etapa de **Denoising** (implica no pasar por el denoising) o la etapa de **Cleaning** (implica no pasar por el AudioAnalyzer para filtrar audios).
+
+La configuración de las diferentes etapas se debe realizar desde `config.yaml`

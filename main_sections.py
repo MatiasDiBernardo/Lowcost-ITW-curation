@@ -1,12 +1,16 @@
 import os
+import yaml
 import shutil
 import warnings
 import pandas as pd
 from tqdm import tqdm
 
-# Env Var
-TEST = True
-VERBOSE = False
+# Cargar config gloabal
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+TEST = config["test"]
+VERBOSE = config["verbose"]
 
 if not VERBOSE:
     warnings.simplefilter("ignore", UserWarning)
