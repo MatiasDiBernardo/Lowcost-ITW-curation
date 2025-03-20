@@ -99,6 +99,12 @@ Vamos a trabajar con 2 carpetas de datos, una para testeos y otra para el datase
 
 1) Test1: Audio con buena calidad y dicción. En la etapa de *Preparar Datos* el VAD tiene que generar 7 segmentos. Ningún segmento debería ser eliminado en la etapa de *Limpiar Datos*.
 2) Test2: Audio con mala calidad y ruido de fondo y no se entiende lo que dicen. En la etapa de *Preparar Datos* el VAD tiene que generar 2 segmentos. Todos los segmentos se deberían eliminar en la etapa de *Limpiar Datos*.
+3) Test3: Audio de buena calidad y con buena dicción pero con mucho reverb.
+4) Test4: Este audio tiene muchas partes malas (risas, ruido de fondo, etc) pero varias partes donde hay buen audio para rescatar.
+5) Test5: Audio donde se habla rápido y se pegan mucho las palabras.
+6) Test6: Audio donde la persona habla lento y con una cadencia marcada.
+7) Test7: Audio con mucho clipeo y música al principio.
+
 
 **Links** 
 

@@ -2,7 +2,7 @@ import os
 import shutil
 
 # Para usar cuando quiero volver al estado original (acá poner los audios con los que se quiere testear)
-audios_to_recover = ["Test1.wav", "Test2.wav"]
+audios_to_recover = ["Test1.wav", "Test2.wav", "Test3.wav", "Test4.wav", "Test5.wav", "Test6.wav", "Test7.wav"]
 
 # Devuelve a la carpeta process
 process_path = os.path.join("Datos", "Audio_to_Process")

@@ -3,6 +3,9 @@ from pydub import AudioSegment
 import shutil
 import numpy as np
 
+TEST = True
+VERBOSE = False
+
 def load_to_wav(audio_path,output_path = "converted_audio.wav"):
     # Convertir ruta a absoluta para evitar problemas con rutas relativas
     audio_path = os.path.abspath(audio_path)
@@ -84,7 +87,11 @@ def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, 
     if use_normal_distribution:
         current_chunk = AudioSegment.silent(duration=0)
         current_duration = 0
-        target_duration = max(1, np.random.normal(mean_duration, std_duration))  # Generar la primera duración objetivo
+        minimum_duration_accepted = 10  # Segundos
+        if TEST:
+            np.random.seed(7)
+
+        target_duration = max(minimum_duration_accepted, np.random.normal(mean_duration, std_duration))  # Generar la primera duración objetivo
 
         for ts in adjusted_timestamps:
             start_ms = int(ts['start'] * 1000)
@@ -117,10 +124,8 @@ def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, 
         chunk_path = os.path.join(output_folder, chunk_name)
         chunk.export(chunk_path, format="wav")
 
-    print(f"✅ Se guardaron {len(combined_chunks)} fragmentos en {output_folder}.")
-
-
-
+    if VERBOSE:
+        print(f"✅ Se guardaron {len(combined_chunks)} fragmentos en {output_folder}.")
 
 def extract_and_sort_timestamps(audio_dict):
     """
