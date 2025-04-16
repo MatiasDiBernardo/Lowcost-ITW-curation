@@ -70,6 +70,8 @@ def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, 
 
     adjusted_timestamps = []
 
+    MAX_ADJUSTMENT = 5  # Tiempo maximo de silencio que se puede agregar a un chunk en caso de que extend_silece este activo
+
     if extend_silence:
         for i in range(len(timestamps)):
             start = timestamps[i]['start']
@@ -79,7 +81,7 @@ def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, 
                 prev_end = timestamps[i - 1]['end']
                 silence_gap = start - prev_end
                 if silence_gap > 0:
-                    adjustment = silence_gap / 2
+                    adjustment = min(silence_gap / 2, MAX_ADJUSTMENT)
                     start -= adjustment
                     adjusted_timestamps[-1]['end'] += adjustment
             

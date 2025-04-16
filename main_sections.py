@@ -9,6 +9,10 @@ from tqdm import tqdm
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
+VAD_config = config["VAD"]
+mean_duration=VAD_config["mean_duration"]
+std_desv=VAD_config["std_desv"]
+
 TEST = config["test"]
 VERBOSE = config["verbose"]
 
@@ -67,7 +71,7 @@ def audio_vad(path_audios, path_before):
         name = audio.split(".")[0]
         folder_ouput_vad = os.path.join(vad_path, name)
         os.mkdir(folder_ouput_vad)
-        vad_audio_splitter(os.path.join(denoise_path, audio), folder_ouput_vad)
+        vad_audio_splitter(os.path.join(denoise_path, audio), folder_ouput_vad,mean_duration,std_desv)
 
 def audio_clean(path_audios):
     """Filtra los audios que no cumplen los criterios del AudioAnalyzer, Filler Detection 

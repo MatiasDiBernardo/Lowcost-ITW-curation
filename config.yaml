@@ -11,7 +11,9 @@ nisqa:
   batch_size: 10
 
 # VAD
-
+VAD:
+  mean_duration: 15
+  std_desv: 5
   
 
 

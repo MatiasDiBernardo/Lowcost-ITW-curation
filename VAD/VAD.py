@@ -195,7 +195,7 @@ silero = load_silero_vad()
 model = whisper.load_model("tiny")
 
 
-def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
+def vad_audio_splitter(path, path_folder_out,mean_duration,std_desv):
 
     global best_speech_timestamps, best_score, original_best_speech_timestamps
     """Separa un audio en segmentos de duración entre una duración mínima y máxima de acuerdo
@@ -266,6 +266,6 @@ def vad_audio_splitter(path, path_folder_out, min_duracion=15, max_duracion=30):
     if os.path.exists("converted_audio.wav"):
         os.remove("converted_audio.wav")
 
-    split_audio_chunks(path,resultados_finales,path_folder_out,mean_duration=15,std_duration=5,use_normal_distribution=True,extend_silence=True)
+    split_audio_chunks(path,resultados_finales,path_folder_out,mean_duration,std_desv,use_normal_distribution=True,extend_silence=True)
 
 
