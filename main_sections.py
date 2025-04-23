@@ -2,6 +2,8 @@ import os
 import yaml
 import shutil
 import warnings
+
+from pydub import AudioSegment
 import pandas as pd
 from tqdm import tqdm
 
@@ -24,25 +26,73 @@ from Denoising.deep_net import denoise_deep_net
 from VAD.VAD import vad_audio_splitter 
 from STT.whisper import stt_whisper
 
+def metadata_verification(csv_path: str, target: str):
+    """
+    Se fija si el nombre del audio en "Audio_to_Process" esta en 
+    el archivo de metadatos.
+    """
+    # Load with header trimming spaces
+    df = pd.read_csv(csv_path, encoding='utf-8')
+
+    # Filter exact matches
+    matches = df[df['Estimulo'] == target]
+
+    # Evaluate match results
+    if matches.empty:
+        raise ValueError(f"No match found for Estimulo: '{target}'")
+    if len(matches) > 1:
+        raise ValueError(f"Multiple matches found for Estimulo: '{target}'")
+
+    return int(matches['ID'].iloc[0])
+
 def audio_processing(path_audios):
     """Esta función pasa los audio de la sección a procesar a la carpeta de audios raw.
     Verifica que exista la metadata de los audios a agregar y normaliza la nomenclatura.
 
     Args:
         path_audios (str): Lista de nombres de los audios en Audios_to_Process
+    Return:
+        (list[str]): Lista de paths con los nombres normalizados
     """
 
     process_path = os.path.join("Datos", "Audio_to_Process")
     raw_path = os.path.join("Datos", "Audios_Raw")
+    path_list_normalized = []
 
     for audio in tqdm(path_audios, desc="Processing audios"):
-        if TEST:
-            # En el TEST solo los mueve (no se ajunta estos audios a la metadata)
+        path = os.path.join(process_path, audio)
+        name = audio.split(".")[0]
+
+        if TEST and name[:-1] == "Test":
+            # En TEST solo mueve los audios de prueba (no se verifica metadata)
             shutil.move(os.path.join(process_path, audio), os.path.join(raw_path, audio))
-        
-        # Verificar que audio esté en csv
-        # Aplicar formato
-        # Normaliza nombre
+
+        if not TEST and name[:-1] != "Test":
+            # Verificar que audio esté en csv (verificar que el nombre del archivo este en el CSV)
+            id_audio = metadata_verification("metadata.csv", name)
+
+            # Normalizar Amplitud
+
+            # Aplicar formato (lo paso a wav por las dudas para que funcione)
+            if path.endswith("mp3"):
+                audio = AudioSegment.from_mp3(path)
+                path = os.path.join(process_path, name + ".wav")
+
+                # Export as WAV
+                audio.export(path, format="wav")
+                os.remove(os.path.join(process_path, name + ".mp3"))
+
+            # Normaliza nombre
+            name_normalizado = f"audio_{str(id_audio)}.wav"
+            path_normalizado = os.path.join(process_path, name_normalizado)
+            os.rename(path, path_normalizado)
+            
+            # Mueve a la siguiente carpeta
+            shutil.move(path_normalizado, os.path.join(raw_path, name_normalizado))
+            path_list_normalized.append(name_normalizado)
+
+    return path_list_normalized
+
 
 def audio_denoise(path_audios):
     """ Aplica denoising a los audios y los mueve a la carpeta Audios_Denoise

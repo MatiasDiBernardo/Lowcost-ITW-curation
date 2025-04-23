@@ -57,7 +57,7 @@ Estos archivos se encuentran en el directorio principal:
 
 - `metadata.csv`: Este CSV tiene la información del dataset. Al agregar un audio al dataset se tiene que agregar una línea en este csv con los siguientes campos:
     * ID (int): Numero que se incrementa en función del anterior
-    * Estímulo (string): Nombre de la fuente de donde se sacó el audio
+    * Estímulo (string): Nombre de la fuente de donde se sacó el audio. **IMPORTANTE** El nombre tiene que el mismo que el archivo en Audio_to_Process, pero hay que asegurarse que dicho nombre no conenga comas ni puntos.
     * Dialecto (string): String con la región del acento de la persona en el audio. Las categorías son (Porteño, Norte, ...)
     * Tipo (string): El formato de contenido del que se sacó el audio (Podcast, Entrevista, Charla Ted, etc) 
     * Género (int): Numero que corresponde al siguiente mapeo {Hombre:0, Mujer:1, Otro:2}
