@@ -147,7 +147,8 @@ def audio_clean(path_audios):
                 folder_dest = os.path.join(clean_audios_path, folder, path_chunk)
                 shutil.copy(segment_audio, folder_dest)
             else:
-                # Agregar a la carpeta de remove
+                folder_dest = os.path.join(clean_audios_path, "removed", path_chunk)
+                shutil.copy(segment_audio, folder_dest)
                 if VERBOSE:
                     print(f"Se descartó el audio {path_chunk}")
 
