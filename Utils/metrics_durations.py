@@ -2,7 +2,7 @@ import os
 from pydub import AudioSegment
 
 # Script para analizar los tiempos del dataset específicado por IDs
-IDs_to_analyze = [1, 2, 3]
+IDs_to_analyze = [4, 5]
 
 total_time = 0
 for id in IDs_to_analyze:

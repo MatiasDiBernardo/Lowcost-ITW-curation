@@ -38,13 +38,12 @@ def simple_direct_implementation():
     process_path = os.path.join("Datos", "Audios_Raw") 
     audios_to_process = os.listdir(process_path)
     
-    #audio_processing(audios_to_process)
-    #audio_denoise(audios_to_process)
+    audio_processing(audios_to_process)
+    audio_denoise(audios_to_process)
     audio_vad(audios_to_process, "Audios_Denoise")
     audio_clean(audios_to_process)
     audio_transcript(audios_to_process, "Audios_Clean")
     audio_transcript_to_dataset(audios_to_process)
 
 if __name__ == "__main__":
-    #automatic_dataset_generator(config_flow)
-    simple_direct_implementation()
+    automatic_dataset_generator(config_flow)
