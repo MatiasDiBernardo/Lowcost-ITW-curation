@@ -1,6 +1,7 @@
-ID,Estimulo,Dialecto,Tipo,Genero,Lenguaje,Audios_VAD,Audios_Clean,Audios_Trasncript
-1,El éxito invisible - 2014  Fabricio Oberto  TEDxCordoba - TEDx Talks,Centro,Charla TED,0,Formal,0,0,0
-2,Volver a mirarnos  Liliana González  TEDxCordoba - TEDx Talks,Centro,Charla TED,1,Formal,0,0,0
-3,Vendí todo menos el show José Palazzo  TEDxCordoba - TEDx Talks,Centro,Charla TED,0,Formal,0,0,0
-4,Emma_data_Cordoba6,Centro,Video YouTube,0,Formal,0,0,0
-5,Emma_data_Cordoba7,Centro,Video YouTube,0,Formal,0,0,0
+ID,Estimulo,Dialecto,Tipo,Genero,Lenguaje,Audios_VAD,Audios_Clean,Audios_Trasncript,Link
+1,El éxito invisible - 2014  Fabricio Oberto  TEDxCordoba - TEDx Talks,Centro,Charla TED,0,Formal,0,0,0,https://youtu.be/qFdtNT1C_UE
+2,Volver a mirarnos  Liliana González  TEDxCordoba - TEDx Talks,Centro,Charla TED,1,Formal,0,0,0,https://youtu.be/NrElYgJzwqY
+3,Vendí todo menos el show José Palazzo  TEDxCordoba - TEDx Talks,Centro,Charla TED,0,Formal,0,0,0,https://youtu.be/D_onq2VfJyk
+4,Emma_data_Cordoba6,Centro,Video YouTube,0,Formal,0,0,0,https://youtu.be/bPvnPM6qN5o
+5,Emma_data_Cordoba7,Centro,Video YouTube,0,Formal,0,0,0,https://youtu.be/C5PT4v_xwD0
+6,cami_vazquez_tiktok,Centro,Video TikTok,1,Informal,0,0,0,https://www.tiktok.com/@cami.vazquezz000/video/7376764599925820677

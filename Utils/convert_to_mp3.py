@@ -54,3 +54,6 @@ def all_mp3():
             convert_mp3(audio, path_complete)
     
     print("All audios are on MP3 Format")
+    
+all_mp3()
+

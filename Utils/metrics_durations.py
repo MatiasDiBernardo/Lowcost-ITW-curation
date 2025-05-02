@@ -2,11 +2,11 @@ import os
 from pydub import AudioSegment
 
 # Script para analizar los tiempos del dataset específicado por IDs
-IDs_to_analyze = [4, 5]
+IDs_to_analyze = [6]
 
 total_time = 0
 for id in IDs_to_analyze:
-    audio_path = os.path.join("Datos", "Audios_Raw", f"audio_{str(id)}.wav")
+    audio_path = os.path.join("Datos", "Audios_Raw", f"audio_{str(id)}.mp3")
     audio = AudioSegment.from_file(audio_path)
     minutes = len(audio) / 1000 / 60
     total_time += minutes
