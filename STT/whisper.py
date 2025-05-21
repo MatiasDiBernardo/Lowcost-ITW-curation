@@ -11,9 +11,11 @@ def stt_whisper(audio_path):
     Returns:
         str: Transcripción del audio
     """
+    print("Usando el slow")
     model = whisper.load_model(MODEL_SIZE)
 
     # Transcribe audio
     result = model.transcribe(audio_path)
 
-    return result
+    # Change only for test, original only returns resut
+    return result["text"]
