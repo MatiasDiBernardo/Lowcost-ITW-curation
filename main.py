@@ -3,7 +3,7 @@ from main_sections import *
 import os
 
 # Config data flow (si se aplica o no estos procesos en la cadena)
-config_flow = {"denoising": True, "cleaning": True}
+config_flow = {"denoising": True, "cleaning": True, "STT": False}
 
 def automatic_dataset_generator(config):
     # Siempre empieza en Audios to Process 
@@ -18,18 +18,24 @@ def automatic_dataset_generator(config):
         audio_denoise(audios_to_process)
         audio_vad(audios_to_process, "Audios_Denoise")
         if config["cleaning"]:
-            audio_clean(audios_to_process)
-            audio_transcript(audios_to_process, "Audios_Clean")
-            audio_transcript_to_dataset(audios_to_process)
+            if config['STT']:
+                audio_clean(audios_to_process)
+                audio_transcript(audios_to_process, "Audios_Clean")
+                audio_transcript_to_dataset(audios_to_process)
+            else:
+                audio_clean(audios_to_process)
         else:
             audio_transcript(audios_to_process, "Audios_VAD")
             audio_transcript_to_dataset(audios_to_process)
     else:
         audio_vad(audios_to_process, "Audios_Raw")
         if config["cleaning"]:
-            audio_clean(audios_to_process)
-            audio_transcript(audios_to_process, "Audios_Clean")
-            audio_transcript_to_dataset(audios_to_process)
+            if config['STT']:
+                audio_clean(audios_to_process)
+                audio_transcript(audios_to_process, "Audios_Clean")
+                audio_transcript_to_dataset(audios_to_process)
+            else:
+                audio_clean(audios_to_process)
         else:
             audio_transcript(audios_to_process, "Audios_VAD")
             audio_transcript_to_dataset(audios_to_process)
@@ -47,3 +53,4 @@ def simple_direct_implementation():
 
 if __name__ == "__main__":
     automatic_dataset_generator(config_flow)
+    # Agregar función para subir Data clean al drive
