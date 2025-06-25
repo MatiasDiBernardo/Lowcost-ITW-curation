@@ -1,3 +1,4 @@
 /.vscode
 /Datos
 __pycache__
+.env

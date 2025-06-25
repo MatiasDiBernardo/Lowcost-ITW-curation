@@ -24,7 +24,7 @@ if not VERBOSE:
 from AudioAnalyzer.NISQA import run_audio_predict
 from Denoising.deep_net import denoise_deep_net
 from VAD.VAD import vad_audio_splitter 
-from STT.whisper import stt_whisper
+from STT.whisper_groq import STT_Groq
 
 def metadata_verification(csv_path: str, target: str):
     """
@@ -174,9 +174,9 @@ def audio_transcript(path_audios, path_before):
         for path_chunk in chunk_audios:
             # Genera la transcripción y la agrega en conjunto con el nombre del archivo
             segment_audio = os.path.join(clean_path, folder, path_chunk)
-            transcript = stt_whisper(segment_audio)
+            transcript = STT_Groq(segment_audio)
             name = path_chunk.split(".")[0]
-            data.append((name, transcript["text"]))
+            data.append((name, transcript))
             # Mueve el audio a la carpeta transcripción
             shutil.copy(os.path.join(clean_path, folder, path_chunk), os.path.join(transcript_path, folder, path_chunk))
         
