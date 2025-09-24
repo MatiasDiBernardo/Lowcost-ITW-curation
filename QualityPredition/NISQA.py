@@ -1,4 +1,4 @@
-from AudioAnalyzer.nisqa.nisqa.NISQA_model import nisqaModel, set_verbose
+from QualityPredition.nisqa.nisqa.NISQA_model import nisqaModel, set_verbose
 
 import os
 import librosa

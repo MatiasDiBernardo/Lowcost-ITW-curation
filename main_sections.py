@@ -7,7 +7,6 @@ from pydub import AudioSegment
 import pandas as pd
 from tqdm import tqdm
 
-# Cargar config gloabal
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
@@ -21,10 +20,10 @@ VERBOSE = config["verbose"]
 if not VERBOSE:
     warnings.simplefilter("ignore", UserWarning)
 
-from AudioAnalyzer.NISQA import run_audio_predict
+from QualityPredition.NISQA import run_audio_predict
 from Denoising.deep_net import denoise_deep_net
 from VAD.VAD import vad_audio_splitter 
-from STT.whisper_groq import STT_Groq
+from STT.whisper import stt_whisper
 
 def metadata_verification(csv_path: str, target: str):
     """
@@ -174,7 +173,7 @@ def audio_transcript(path_audios, path_before):
         for path_chunk in chunk_audios:
             # Genera la transcripción y la agrega en conjunto con el nombre del archivo
             segment_audio = os.path.join(clean_path, folder, path_chunk)
-            transcript = STT_Groq(segment_audio)
+            transcript = stt_whisper(segment_audio)
             name = path_chunk.split(".")[0]
             data.append((name, transcript))
             # Mueve el audio a la carpeta transcripción

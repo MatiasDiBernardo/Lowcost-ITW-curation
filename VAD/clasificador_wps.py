@@ -1,5 +1,3 @@
-
-
 def classify_segments_by_speed(result, unit="segundo"):
     """Clasifica segmentos según la velocidad de habla (WPS) con atributos id, start, end y speed."""
     time_factor = 1 if unit == "segundo" else 60

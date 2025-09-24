@@ -3,7 +3,7 @@ from main_sections import *
 import os
 
 # Config data flow (si se aplica o no estos procesos en la cadena)
-config_flow = {"denoising": True, "cleaning": True, "STT": True}
+config_flow = {"denoising": True, "cleaning": True, "STT": False}
 
 def automatic_dataset_generator(config):
     # Siempre empieza en Audios to Process 
