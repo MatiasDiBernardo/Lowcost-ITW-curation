@@ -1,11 +1,11 @@
 
-# ASR Dataset Generator
+# Low Cost pre-processing pipeline for ITW datasets generation
 
-This repository contains an algorithm to identify the best sections of long audio files, enabling the creation of high-quality datasets for ASR tasks.
+This repository contains an algorithm to select the best sections of noisy speech datasets, enabling the creation of high-quality datasets for ASR tasks.
 
 ## Folder Structure
 
-All data folders are located inside the main `Datos` directory. You can automatically create all required folders using the script `Utils/create_folder_estructure.py`.
+All data folders are located inside the main `Data` directory. You can automatically create all required folders using the script `Utils/create_folder_estructure.py`.
 
 - **Audio_to_Process**: Place new audios here to be processed. After processing, files are moved to the raw audios folder and this folder is emptied.
 - **Audios_Raw**: Contains raw audios to be processed (e.g., podcasts, videos). Files are renamed with an ID and name separated by `_`.
@@ -23,28 +23,68 @@ The `config.yaml` file allows you to adjust key parameters for each stage of the
     - `test`: Enable or disable test mode.
     - `verbose`: Enable or disable verbose output.
 
-- **NISQA (Quality Prediction)**
+- **VAD (Voice Activity Detection)**
+    - `mean_duration`: Mean duration for audio segments (seconds).
+    - `std_desv`: Standard deviation for segment duration.
+
+- **Quality Prediction**
+    - `type`: Mos predictor model ("NISQA" or "DNS MOS").
     - `threshold`: Quality threshold for audio selection.
     - `max_seconds`: Maximum duration for audio segments.
     - `min_seconds`: Minimum duration for audio segments.
     - `num_workers`: Number of workers for batch processing.
     - `batch_size`: Batch size for processing.
 
-- **VAD (Voice Activity Detection)**
-    - `mean_duration`: Mean duration for audio segments (seconds).
-    - `std_desv`: Standard deviation for segment duration.
+- **Denoising**
+    - `type`: Denoising model ("None", "Demucs" or "DeepFilterNet").
+
+- **Transcription (STT)**
+    - `type`: Only Whisper model (working on accurate alternatives).
+    - `model_size`: Whisper model size ("Small", "Large", "Turbo").
 
 You can modify these parameters in `config.yaml` to change how the pipeline processes your audio data.
 
-## Installation
+## Installation — dependencies
 
-All dependencies required for this project are listed in the `requirements.txt` file. To install them, run:
+### 1) Pipeline only (lightweight) — recommended for production / dataset generation
+Create and activate a virtual environment, then install the core package (no heavy metric libraries):
 
 ```bash
-pip install -r requirements.txt
+python -m venv .venv
+
+# macOS / Linux
+source .venv/bin/activate
+
+# Windows (PowerShell)
+# .\.venv\Scripts\Activate.ps1
+
+pip install --upgrade pip setuptools wheel
+pip install .
 ```
 
-Make sure you have Python 3.9.1 or later installed. Some modules (e.g., Whisper) may require additional system dependencies such as ffmpeg.
+### 2) Pipeline + Metrics (heavy) — for evaluation and reproducing paper figures
+
+Inside the same activated virtualenv, install the optional metrics extras (PESQ/STOI/NISQA/room acoustics, etc.):
+
+```bash
+pip install .[metrics]
+```
+What this provides: all metric calculation libraries required to run evaluation scripts such as utils/evaluate_dataset_metrics.py. These are heavier and may need system build tools or ML runtimes (e.g., torch).
+
+### 3) Using Poetry (project-managed venv)
+
+Install core dependencies with Poetry:
+
+```bash
+poetry install
+```
+Add metrics extras into the Poetry venv (reliable across Poetry versions):
+
+```bash
+# Run pip inside Poetry-managed venv to install extras from the local project
+poetry run pip install .[metrics]
+```
+(Some Poetry versions support installing extras directly — consult your Poetry version docs. Using poetry run pip is broadly compatible.)
 
 ## Running the Program
 

@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "tts-pipeline"
+version = "0.1.0"
+description = "Metric-driven preprocessing for in-the-wild TTS datasets"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.24"
+soundfile = "^0.12"
+ffmpeg-python = "^0.3"          # thin ffmpeg wrapper used by some scripts
+# VAD / segmentation (example)
+silero-vad = "^0.0"             # replace by the VAD package you use
+# optional denoisers / enhancers can be listed in extras (see below)
+# STT dependency can be optional too (Whisper is heavy) — see "optional extras" below
+
+[tool.poetry.extras]
+# metric calculation libraries (heavy) are grouped here
+metrics = [
+  "pesq",              # perceptual eval of speech quality
+  "pystoi",            # STOI intelligibility metric
+  "nisqa",             # NISQA perceptual predictor (example)
+  "pyroomacoustics",   # acoustic parameters (T30, C50)
+  "librosa",
+  "torch"              # needed if any metric uses neural models
+]
+
+# you may also add other extras such as 'denoisers' or 'stt' depending on usage:
+# [tool.poetry.extras]
+# denoisers = ["demucs"]
+# stt = ["openai-whisper"]

@@ -2,16 +2,21 @@
 test: false
 verbose: false 
 
-# Nisca
-nisqa:
+quality_prediction:
+  type: "NISQA"
   threshold: 3.8
   max_seconds: 40.0
   min_seconds: 8.0
   num_workers: 0
   batch_size: 10
+  
+denoising:
+  type: "DeepFilterNet"
 
-# VAD
 VAD:
   mean_duration: 15
   std_desv: 5
   
+STT:
+  type: "Whisper"
+  model_size: "Large"
