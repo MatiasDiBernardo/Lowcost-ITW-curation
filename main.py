@@ -1,19 +1,20 @@
 from main_sections import *
 
+
 import os
 
-# Config data flow (si se aplica o no estos procesos en la cadena)
+# Config data flow (whether these processes are applied in the chain)
 config_flow = {"denoising": True, "cleaning": True, "STT": False}
 
 def automatic_dataset_generator(config):
-    # Siempre empieza en Audios to Process 
-    process_path = os.path.join("Datos", "Audio_to_Process") 
+    # Always starts in Audios to Process
+    process_path = os.path.join("Datos", "Audio_to_Process")
     audios_to_process = os.listdir(process_path)
-    
-    # Para codear esto bien tendría que plantear la lógica de los if como un árbol (no tengo ganas)
+
+    # To code this well, I should set up the logic of the ifs as a tree (I don't feel like it)
     audios_to_process = audio_processing(audios_to_process)
-    
-    # Brancheo para poder hacer diferentes configuraciones
+
+    # Branching to allow different configurations
     if config["denoising"]:
         audio_denoise(audios_to_process)
         audio_vad(audios_to_process, "Audios_Denoise")
@@ -21,36 +22,30 @@ def automatic_dataset_generator(config):
             if config['STT']:
                 audio_clean(audios_to_process)
                 audio_transcript(audios_to_process, "Audios_Clean")
-                audio_transcript_to_dataset(audios_to_process)
             else:
                 audio_clean(audios_to_process)
         else:
             audio_transcript(audios_to_process, "Audios_VAD")
-            audio_transcript_to_dataset(audios_to_process)
     else:
         audio_vad(audios_to_process, "Audios_Raw")
         if config["cleaning"]:
             if config['STT']:
                 audio_clean(audios_to_process)
                 audio_transcript(audios_to_process, "Audios_Clean")
-                audio_transcript_to_dataset(audios_to_process)
             else:
                 audio_clean(audios_to_process)
         else:
             audio_transcript(audios_to_process, "Audios_VAD")
-            audio_transcript_to_dataset(audios_to_process)
 
 def simple_direct_implementation():
-    process_path = os.path.join("Datos", "Audios_Raw") 
+    process_path = os.path.join("Datos", "Audios_Raw")
     audios_to_process = os.listdir(process_path)
-    
+
     audio_processing(audios_to_process)
     audio_denoise(audios_to_process)
     audio_vad(audios_to_process, "Audios_Denoise")
     audio_clean(audios_to_process)
     audio_transcript(audios_to_process, "Audios_Clean")
-    audio_transcript_to_dataset(audios_to_process)
 
 if __name__ == "__main__":
     automatic_dataset_generator(config_flow)
-    # Agregar función para subir Data clean al drive

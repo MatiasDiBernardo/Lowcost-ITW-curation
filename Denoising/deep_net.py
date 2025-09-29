@@ -1,12 +1,11 @@
 from df.enhance import enhance, init_df, load_audio, save_audio
 
 def denoise_deep_net(input_audio, output_audio):
-    """Aplica el algorítmo de denoising a un audio y los guarda 
-    en la dirección específicada. 
+    """ Applied DeepFilterNet denoising algorithm. 
 
     Args:
-        input_audio (str): Path del audio de entrada a denoisear
-        output_audio (str): Path donde se guarda el audio denoiseado
+        input_dir (str): Path to folder with audios in wav format and any sample rate.
+        output_dir (str): Path to the output folder of denoised audios.
     """
     # Load default model
     model, df_state, _ = init_df(log_file=None, log_level="NONE")

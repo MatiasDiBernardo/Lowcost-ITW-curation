@@ -25,79 +25,65 @@ from Denoising.deep_net import denoise_deep_net
 from VAD.VAD import vad_audio_splitter 
 from STT.whisper import stt_whisper
 
-def metadata_verification(csv_path: str, target: str):
+
+def get_id():
+    """Checks the processed audios folder and gets the last index
     """
-    Se fija si el nombre del audio en "Audio_to_Process" esta en 
-    el archivo de metadatos.
-    """
-    # Load with header trimming spaces
-    df = pd.read_csv(csv_path, encoding='utf-8')
+    folder_data = "Datos/Audios_VAD"
+    data = os.listdir(folder_data)
+    if len(data) == 0:
+        return 0
 
-    # Filter exact matches
-    matches = df[df['Estimulo'] == target]
+    ids = [int(folder.split("_")[1]) for folder in data]
 
-    # Evaluate match results
-    if matches.empty:
-        raise ValueError(f"No match found for Estimulo: '{target}'")
-    if len(matches) > 1:
-        raise ValueError(f"Multiple matches found for Estimulo: '{target}'")
-
-    return int(matches['ID'].iloc[0])
+    return max(ids)
 
 def audio_processing(path_audios):
-    """Esta función pasa los audio de la sección a procesar a la carpeta de audios raw.
-    Verifica que exista la metadata de los audios a agregar y normaliza la nomenclatura.
+    """This function moves the audios from the section to process to the raw audios folder.
+    Verifies that the metadata of the audios to add exists and normalizes the naming.
 
     Args:
-        path_audios (str): Lista de nombres de los audios en Audios_to_Process
+        path_audios (str): List of audio names in Audios_to_Process
     Return:
-        (list[str]): Lista de paths con los nombres normalizados
+        (list[str]): List of paths with normalized names
     """
 
     process_path = os.path.join("Datos", "Audio_to_Process")
     raw_path = os.path.join("Datos", "Audios_Raw")
     path_list_normalized = []
+    id_audio = get_id()
+
 
     for audio in tqdm(path_audios, desc="Processing audios"):
         path = os.path.join(process_path, audio)
         name = audio.split(".")[0]
+        id_audio += 1
 
-        if TEST and name[:-1] == "Test":
-            # En TEST solo mueve los audios de prueba (no se verifica metadata)
-            shutil.move(os.path.join(process_path, audio), os.path.join(raw_path, audio))
+    # Apply format (convert to wav just in case for compatibility)
+        if path.endswith("mp3"):
+            audio = AudioSegment.from_mp3(path)
+            path = os.path.join(process_path, name + ".wav")
 
-        if not TEST and name[:-1] != "Test":
-            # Verificar que audio esté en csv (verificar que el nombre del archivo este en el CSV)
-            id_audio = metadata_verification("metadata.csv", name)
+            # Export as WAV
+            audio.export(path, format="wav")
+            os.remove(os.path.join(process_path, name + ".mp3"))
 
-            # Normalizar Amplitud
-
-            # Aplicar formato (lo paso a wav por las dudas para que funcione)
-            if path.endswith("mp3"):
-                audio = AudioSegment.from_mp3(path)
-                path = os.path.join(process_path, name + ".wav")
-
-                # Export as WAV
-                audio.export(path, format="wav")
-                os.remove(os.path.join(process_path, name + ".mp3"))
-
-            # Normaliza nombre
-            name_normalizado = f"audio_{str(id_audio)}.wav"
-            path_normalizado = os.path.join(process_path, name_normalizado)
-            os.rename(path, path_normalizado)
-            
-            # Mueve a la siguiente carpeta
-            shutil.move(path_normalizado, os.path.join(raw_path, name_normalizado))
-            path_list_normalized.append(name_normalizado)
+    # Normalize name
+        name_normalizado = f"audio_{str(id_audio)}.wav"
+        path_normalizado = os.path.join(process_path, name_normalizado)
+        os.rename(path, path_normalizado)
+        
+    # Move to the next folder
+        shutil.move(path_normalizado, os.path.join(raw_path, name_normalizado))
+        path_list_normalized.append(name_normalizado)
 
     return path_list_normalized
 
-
 def audio_denoise(path_audios):
-    """ Aplica denoising a los audios y los mueve a la carpeta Audios_Denoise
+    """Applies denoising to the audios and moves them to the Audios_Denoise folder
 
     Args:
-        path_audios (str): Lista de nombres de los audios en Audios_to_Process
+        path_audios (str): List of audio names in Audios_to_Process
     """
     raw_path = os.path.join("Datos", "Audios_Raw")
     denoise_path = os.path.join("Datos", "Audios_Denoise") 
@@ -106,11 +92,11 @@ def audio_denoise(path_audios):
         denoise_deep_net(os.path.join(raw_path, audio), os.path.join(denoise_path, audio))
 
 def audio_vad(path_audios, path_before):
-    """Separa los audios a procesar en chunks y los pone en la carpeta de Audios_VAD
+    """Splits the audios to process into chunks and puts them in the Audios_VAD folder
 
     Args:
-        path_audios (str): Lista de nombres de los audios en Audios_to_Process
-        path_before (str): Nombre de la carpeta donde sacar los datos para el vad. Ej, Audios_Denoise
+        path_audios (str): List of audio names in Audios_to_Process
+        path_before (str): Name of the folder to get the data for VAD. E.g., Audios_Denoise
     """
 
     denoise_path = os.path.join("Datos", path_before)
@@ -182,6 +168,3 @@ def audio_transcript(path_audios, path_before):
         df = pd.DataFrame(data, columns=["Audio Path", "Transcription"])
         name_csv_file = os.path.join(transcript_path, "transcripts", f"{folder}.csv")
         df.to_csv(name_csv_file, index=False, encoding="utf-8")
-
-def audio_transcript_to_dataset(path_audios):
-    print("Final")

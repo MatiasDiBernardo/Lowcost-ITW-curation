@@ -11,45 +11,45 @@ TEST = config["test"]
 VERBOSE = config["verbose"]
 
 def load_to_wav(audio_path,output_path = "converted_audio.wav"):
-    # Convertir ruta a absoluta para evitar problemas con rutas relativas
+    # Convert path to absolute to avoid problems with relative paths
     audio_path = os.path.abspath(audio_path)
 
-    # Verificar si el archivo existe
+    # Check if the file exists
     if not os.path.exists(audio_path):
-        raise FileNotFoundError(f"No se encontró el archivo: {audio_path}")
+        raise FileNotFoundError(f"File not found: {audio_path}")
 
-    # Determinar formato y cargar audio
+    # Determine format and load audio
     if audio_path.endswith('.mp3'):
         audio = AudioSegment.from_mp3(audio_path)
     elif audio_path.endswith('.wav'):
         audio = AudioSegment.from_wav(audio_path)
     else:
-        raise ValueError("Formato de archivo no soportado. Usa .mp3 o .wav.")
+        raise ValueError("Unsupported file format. Use .mp3 or .wav.")
 
-    # Convertir a mono y ajustar la tasa de muestreo
+    # Convert to mono and adjust sample rate
     audio = audio.set_channels(1)
     audio = audio.set_frame_rate(16000)
 
-    # Exportar archivo convertido
+    # Export converted file
     audio.export(output_path, format="wav")
-    #print(f"Archivo convertido con éxito: {output_path}")
+    #print(f"File successfully converted: {output_path}")
 
 
 def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, std_duration=5, gap=0, offset=0, extend_silence=False, use_normal_distribution=False):
     """
-    Divide un archivo de audio en fragmentos basados en los tiempos dados y ajusta su duración.
-    Puede seguir una distribución normal de duración objetivo si se habilita la opción.
+    Splits an audio file into fragments based on the given times and adjusts their duration.
+    Can follow a normal distribution of target duration if the option is enabled.
     
     Args:
-        audio_file (str): Ruta del archivo de audio original.
-        timestamps (list): Lista de diccionarios con los tiempos de inicio y fin en segundos.
-        output_folder (str): Carpeta donde se guardarán los fragmentos.
-        mean_duration (int): Duración media deseada para los fragmentos en segundos.
-        std_duration (int): Desviación estándar de la duración de los fragmentos en segundos.
-        gap (int): Tiempo adicional en milisegundos a agregar antes y después de cada fragmento.
-        offset (int): Número inicial para nombrar los fragmentos.
-        extend_silence (bool): Si es True, distribuye el silencio entre los segmentos consecutivos.
-        use_normal_distribution (bool): Si es True, usa una distribución normal para definir la duración de los chunks.
+        audio_file (str): Path to the original audio file.
+        timestamps (list): List of dictionaries with start and end times in seconds.
+        output_folder (str): Folder where the fragments will be saved.
+        mean_duration (int): Desired mean duration for the fragments in seconds.
+        std_duration (int): Standard deviation of the fragment duration in seconds.
+        gap (int): Additional time in milliseconds to add before and after each fragment.
+        offset (int): Initial number for naming the fragments.
+        extend_silence (bool): If True, distributes silence between consecutive segments.
+        use_normal_distribution (bool): If True, uses a normal distribution to define the duration of the chunks.
     """
 
     formato = audio_file[-3:].lower()
@@ -63,14 +63,14 @@ def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, 
     else:
         raise ValueError("Formato de audio no soportado. Usa WAV o MP3.")
 
-    # Eliminar y recrear la carpeta de salida
+    # Delete and recreate the output folder
     if os.path.exists(output_folder):
         shutil.rmtree(output_folder)
     os.makedirs(output_folder)
 
     adjusted_timestamps = []
 
-    MAX_ADJUSTMENT = 5  # Tiempo maximo de silencio que se puede agregar a un chunk en caso de que extend_silece este activo
+    MAX_ADJUSTMENT = 5  # Maximum silence time that can be added to a chunk if extend_silence is active
 
     if extend_silence:
         for i in range(len(timestamps)):
@@ -93,11 +93,11 @@ def split_audio_chunks(audio_file, timestamps, output_folder, mean_duration=20, 
     if use_normal_distribution:
         current_chunk = AudioSegment.silent(duration=0)
         current_duration = 0
-        minimum_duration_accepted = 10  # Segundos
+        minimum_duration_accepted = 10  # Seconds
         if TEST:
             np.random.seed(7)
 
-        target_duration = max(minimum_duration_accepted, np.random.normal(mean_duration, std_duration))  # Generar la primera duración objetivo
+        target_duration = max(minimum_duration_accepted, np.random.normal(mean_duration, std_duration))  # Generate the first target duration
 
         for ts in adjusted_timestamps:
             start_ms = int(ts['start'] * 1000)

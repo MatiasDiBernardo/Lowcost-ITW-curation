@@ -8,5 +8,5 @@ def calculate_time_hours(folder_path):
         audio = AudioSegment.from_file(audio_path)
         minutes = len(audio) / 1000 / 60
         total_time_min += minutes
-    
+
     return total_time_min / 60

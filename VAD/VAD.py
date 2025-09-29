@@ -12,19 +12,19 @@ from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
 import optuna
 import logging
 
-optuna.logging.set_verbosity(logging.WARNING)  # Oculta INFO y DEBUG
+optuna.logging.set_verbosity(logging.WARNING)  # Hides INFO and DEBUG
 
 
-# Variables globales para almacenar los mejores resultados
+ # Global variables to store the best results
 best_speech_timestamps = None
-best_score = -float("inf")  # Inicializar con un valor negativo infinito
+best_score = -float("inf")  # Initialize with negative infinity
 
-# Función objetivo para Optuna
+ # Objective function for Optuna
 def objective(trial, param_config,wav):
     
-    global best_speech_timestamps, best_score  # Para actualizar la variable global
+    global best_speech_timestamps, best_score  # To update the global variable
 
-    # Generar los hiperparámetros dinámicamente
+    # Generate hyperparameters dynamically
     params = {}
     for param_name, config in param_config.items():
         if config["type"] == "int":
@@ -40,9 +40,9 @@ def objective(trial, param_config,wav):
                 param_name, config["low"], config["high"]
             )
         else:
-            raise ValueError(f"Tipo desconocido para {param_name}: {config['type']}")
+            raise ValueError(f"Unknown type for {param_name}: {config['type']}")
 
-    # Ejecutar el VAD con los parámetros generados
+    # Run VAD with the generated parameters
     speech_timestamps = get_speech_timestamps(
         wav,
         silero,
@@ -52,10 +52,10 @@ def objective(trial, param_config,wav):
         min_silence_duration_ms=params["min_silence_duration_ms"],
     )
 
-    # Métrica: Maximizar el número de segmentos detectados
+    # Metric: Maximize the number of detected segments
     score = len(speech_timestamps)
 
-    # Si este trial es el mejor hasta ahora, actualizamos los resultados
+    # If this trial is the best so far, update the results
     if score > best_score:
         best_score = score
         best_speech_timestamps = speech_timestamps
@@ -63,7 +63,7 @@ def objective(trial, param_config,wav):
     return score
 
 
-# Función para seleccionar el sampler (método de optimización)
+ # Function to select the sampler (optimization method)
 def get_sampler(method,search_space={}):
     if method == "random":
         return optuna.samplers.RandomSampler()
@@ -72,7 +72,7 @@ def get_sampler(method,search_space={}):
     elif method == "grid":
         return optuna.samplers.GridSampler(search_space)
     else:
-        raise ValueError(f"Método de optimización desconocido: {method}")
+        raise ValueError(f"Unknown optimization method: {method}")
     
 
 def parametros(vel):
