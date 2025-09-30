@@ -44,10 +44,28 @@ The `config.yaml` file allows you to adjust key parameters for each stage of the
 
 You can modify these parameters in `config.yaml` to change how the pipeline processes your audio data.
 
-## Installation — dependencies
 
-### 1) Pipeline only (lightweight) — recommended for production / dataset generation
-Create and activate a virtual environment, then install the core package (no heavy metric libraries):
+## Installation
+
+**Recommended: Poetry (preferred)** — use Poetry to create and manage the project venv, install core pipeline deps, and optionally add the heavy metric libraries used to reproduce the paper’s evaluation.
+
+From the project root copy-paste the appropriate commands:
+
+### Install **pipeline only** (lightweight — recommended for dataset generation / production)
+Use this if you only need the preprocessing pipeline (VAD, segmentation, denoising hooks, transcription hooks). This keeps the environment small and fast to install.
+```bash
+poetry install
+```
+
+### Add metrics (heavy — only if you want to run the paper’s evaluation methodology)
+
+Add this command to calculate evaluation metrics as proposed in our paper.
+```bash
+poetry run pip install .[metrics]
+```
+
+### (Optional) Pip Installation
+Plain venv + pip (if you don’t use Poetry). Create a virtual environment and install with pip:
 
 ```bash
 python -m venv .venv
@@ -55,37 +73,21 @@ python -m venv .venv
 # macOS / Linux
 source .venv/bin/activate
 
-# Windows (PowerShell)
-# .\.venv\Scripts\Activate.ps1
-
 pip install --upgrade pip setuptools wheel
+
+# pipeline only
 pip install .
-```
 
-### 2) Pipeline + Metrics (heavy) — for evaluation and reproducing paper figures
-
-Inside the same activated virtualenv, install the optional metrics extras (PESQ/STOI/NISQA/room acoustics, etc.):
-
-```bash
+# pipeline + metrics (installs core + heavy metric libs)
 pip install .[metrics]
 ```
-What this provides: all metric calculation libraries required to run evaluation scripts such as utils/evaluate_dataset_metrics.py. These are heavier and may need system build tools or ML runtimes (e.g., torch).
+## Running the pipeline
+Follow this step to use the pre processing pipeline:
 
-### 3) Using Poetry (project-managed venv)
+1) Initialize the folder structure with `Utils\create_folder_structure.py`. 
+2) Upload the raw data to `Data\Audios_Raw`. 
+3) Configuration of the pipeline can be done in the `config.yaml`
+4) Execute the pipeline with `main.py`
 
-Install core dependencies with Poetry:
-
-```bash
-poetry install
-```
-Add metrics extras into the Poetry venv (reliable across Poetry versions):
-
-```bash
-# Run pip inside Poetry-managed venv to install extras from the local project
-poetry run pip install .[metrics]
-```
-(Some Poetry versions support installing extras directly — consult your Poetry version docs. Using poetry run pip is broadly compatible.)
-
-## Running the Program
-
-The processing chain is executed via `main.py`. You can configure the pipeline to skip stages such as **Denoising** or **Cleaning** by adjusting the configuration in `config.yaml`.
+## Evaluation of the pipeline
+Once you have a pre processed dataset with ours or any pipeline, use `Metrics\composite_metric.py` that receives the original dataset and the processed dataset and computes the final score to this particular pre processing variant.

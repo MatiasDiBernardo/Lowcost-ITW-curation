@@ -109,11 +109,10 @@ def audio_vad(path_audios, path_before):
         vad_audio_splitter(os.path.join(denoise_path, audio), folder_ouput_vad,mean_duration,std_desv)
 
 def audio_clean(path_audios):
-    """Filtra los audios que no cumplen los criterios del AudioAnalyzer, Filler Detection 
-    y best STT.
+    """Filters out audio files that don't meet the AudioAnalyzer criteria.
 
     Args:
-        path_audios (str): Lista de nombres de los audios en Audios_to_Process
+        path_audios (str): Audio files names from audio VAD.
     """
     vad_path = os.path.join("Datos", "Audios_VAD") 
     clean_audios_path = os.path.join("Datos", "Audios_Clean") 
@@ -123,10 +122,10 @@ def audio_clean(path_audios):
     for folder in tqdm(name_folders, desc="Cleaning audios"):
 
         chunk_audios = os.listdir(os.path.join(vad_path, folder))
-        os.makedirs(os.path.join(clean_audios_path, folder), exist_ok=True)  # Crea la subcarpeta en el destino
+        os.makedirs(os.path.join(clean_audios_path, folder), exist_ok=True)
 
         for path_chunk in chunk_audios:
-            ## Si el AudioAnalyzer considera que el audio es aceptable
+            # If AudioAnalyzer considers the audio acceptable
             segment_audio = os.path.join(vad_path, folder, path_chunk)
             if run_audio_predict(segment_audio):
                 folder_dest = os.path.join(clean_audios_path, folder, path_chunk)
@@ -138,11 +137,11 @@ def audio_clean(path_audios):
                     print(f"Se descartó el audio {path_chunk}")
 
 def audio_transcript(path_audios, path_before):
-    """Agrega transcripción (por ahora sin descarte)
+    """Create transcription of the audios and moves them to the Audios_Transcript folder.
 
     Args:
-        path_audios (str): Lista de nombres de los audios en Audios_to_Process
-        path_before (str): Nombre de la carpeta donde sacar los datos para transcribir. Ej, Audios_Clean
+        path_audios (str): Name audio list from Audios_to_Process
+        path_before (str): Names of the folder from where to transcript. Ej, Audios_Clean
     """
 
     clean_path = os.path.join("Datos", path_before)
@@ -153,16 +152,16 @@ def audio_transcript(path_audios, path_before):
     for folder in tqdm(name_folders, desc="Transcribiendo audios"):
 
         chunk_audios = os.listdir(os.path.join(clean_path, folder))
-        os.makedirs(os.path.join(transcript_path, folder), exist_ok=True)  # Crea la subcarpeta en el destino
+        os.makedirs(os.path.join(transcript_path, folder), exist_ok=True)
 
         data = []
         for path_chunk in chunk_audios:
-            # Genera la transcripción y la agrega en conjunto con el nombre del archivo
+            # Make transcription and pair it with the audio name
             segment_audio = os.path.join(clean_path, folder, path_chunk)
             transcript = stt_whisper(segment_audio)
             name = path_chunk.split(".")[0]
             data.append((name, transcript))
-            # Mueve el audio a la carpeta transcripción
+            # Move the audio to the transcript folder
             shutil.copy(os.path.join(clean_path, folder, path_chunk), os.path.join(transcript_path, folder, path_chunk))
         
         df = pd.DataFrame(data, columns=["Audio Path", "Transcription"])

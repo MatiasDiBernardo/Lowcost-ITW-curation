@@ -6,25 +6,31 @@ description = "Metric-driven preprocessing for in-the-wild TTS datasets"
 [tool.poetry.dependencies]
 python = "^3.9"
 numpy = "^1.24"
+tqdm = "^4.67.1"
+setuptools = "^75.8.0"
+wheel = "^0.45.1"
+pillow = "^11.1.0"
+pip = "^25.0"
+numpy = "^1.26.4"
+scipy = "^1.13.1"
+pandas = "^1.3.5"
+torch = "^2.6.0"
+torchaudio = "^2.6.0"
 soundfile = "^0.12"
-ffmpeg-python = "^0.3"          # thin ffmpeg wrapper used by some scripts
-# VAD / segmentation (example)
-silero-vad = "^0.0"             # replace by the VAD package you use
-# optional denoisers / enhancers can be listed in extras (see below)
-# STT dependency can be optional too (Whisper is heavy) — see "optional extras" below
+silero-vad = "^5.1.2"
+optuna = "^4.2.1"
+deepfilternet = "^0.5.6"
+demucs = "^4.0.1"
+numba = "^0.60.0"
+pyyaml = "^6.0.2"
+openai-whisper = "^20240930"
+ffmpeg-python = "^0.3"          
+pydub = "^0.25.1"
 
 [tool.poetry.extras]
-# metric calculation libraries (heavy) are grouped here
+# metric calculation libraries are grouped here
 metrics = [
-  "pesq",              # perceptual eval of speech quality
-  "pystoi",            # STOI intelligibility metric
-  "nisqa",             # NISQA perceptual predictor (example)
-  "pyroomacoustics",   # acoustic parameters (T30, C50)
-  "librosa",
-  "torch"              # needed if any metric uses neural models
+  "pesto-pitch",       
+  "pymcd",             
+  "pyroomacoustics",   
 ]
-
-# you may also add other extras such as 'denoisers' or 'stt' depending on usage:
-# [tool.poetry.extras]
-# denoisers = ["demucs"]
-# stt = ["openai-whisper"]
