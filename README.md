@@ -91,3 +91,17 @@ Follow this step to use the pre processing pipeline:
 
 ## Evaluation of the pipeline
 Once you have a pre processed dataset with ours or any pipeline, use `Metrics\composite_metric.py` that receives the original dataset and the processed dataset and computes the final score to this particular pre processing variant.
+
+## Citing this work
+If you use this repository or the evaluation methodology, please cite the paper. BibTeX entry below.
+
+```bibtex
+@ARTICLE{Di_Bernardo2025-ai,
+  title        = "Evaluation of preprocessing pipelines in the creation of in-the-wild {TTS} datasets",
+  author       = "Di Bernardo, Mat{\'\i}as and Misley, Emmanuel and Correa, Ignacio and Iacovelli, 
+  Mateo Garc{\'\i}a and Mellino, Sim{\'o}n and Gonzales Barrios, Gala Luc{\'\i}a",
+  year         =  2025,
+  primaryClass = "eess.AS",
+  eprint       = "2510.03111"
+}
+```
