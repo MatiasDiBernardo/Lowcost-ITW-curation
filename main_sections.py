@@ -199,3 +199,14 @@ def audio_transcript(path_audios):
             df = pd.DataFrame(data, columns=["Audio Path", "Transcription"])
             name_csv_file = os.path.join(transcript_path, "transcripts", f"{folder}.csv")
             df.to_csv(name_csv_file, index=False, encoding="utf-8")
+
+
+def audio_dataset():
+    """Compacts all audios into one single audio_data folder and a single transcripts.csv
+    """
+    return None
+
+def clear_audio_stages():
+    """Deletes all data in the intermediate stages
+    """
+    return None

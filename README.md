@@ -5,19 +5,19 @@ This repository contains an algorithm to select the best sections of noisy speec
 
 ## Folder Structure
 
-All data folders are located inside the main `Data` directory. You can automatically create all required folders using the script `Utils/create_folder_estructure.py`.
+All data folders are located inside the main `Data` directory. You can automatically create all required folders using the script `Utils/create_folder_structure.py`.
 
 - **Audio_to_Process**: Place new audios here to be processed. After processing, files are moved to the raw audios folder and this folder is emptied.
 - **Audios_Raw**: Contains raw audios to be processed (e.g., podcasts, videos). Files are renamed with an ID and name separated by `_`.
-- **Audios_Denoise**: Contains denoised audios.
 - **Audios_VAD**: Contains subfolders for each long audio, with segments (chunks) named by audio ID and chunk number.
+- **Audios_Denoise**: Contains denoised audios.
 - **Audios_Clean**: Contains audio segments that passed quality filters. Also includes a `removed` subfolder for tracking discarded audios.
 - **Audios_Transcript**: Contains segments with the best transcriptions. Also includes a `transcripts` subfolder for transcript CSVs.
 - **Dataset**: Contains all the best fragments, merged into a single dataset.
 
 ## Main Configuration (`config.yaml`)
 
-The `config.yaml` file allows you to adjust key parameters for each stage of the processing chain. Example options include:
+The `config.yaml` file allows you to adjust key parameters for each stage of the processing chain. Options include:
 
 - **Global**
     - `test`: Enable or disable test mode.
@@ -47,7 +47,7 @@ You can modify these parameters in `config.yaml` to change how the pipeline proc
 
 ## Installation
 
-**Recommended: Poetry (preferred)** — use Poetry to create and manage the project venv, install core pipeline deps, and optionally add the heavy metric libraries used to reproduce the paper’s evaluation.
+**Recommended: Poetry** — use Poetry to create and manage the project venv, install core pipeline deps, and optionally add the heavy metric libraries used to reproduce the paper’s evaluation.
 
 From the project root copy-paste the appropriate commands:
 
