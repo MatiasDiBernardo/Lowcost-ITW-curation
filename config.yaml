@@ -3,20 +3,20 @@ test: false
 verbose: false 
 
 quality_prediction:
-  type: "NISQA"
+  type: "NISQA"  # Options: ("NISQA", "DNSMOS", "NO FILT")
   threshold: 3.8
   max_seconds: 40.0
   min_seconds: 8.0
   num_workers: 0
   batch_size: 10
   
-denoising:
+denoising:  # Options: ("DeepFilterNet", "Demucs", "No denoising")
   type: "DeepFilterNet"
 
-VAD:
+VAD:  # This options control segment duration (mean and std)
   mean_duration: 15
   std_desv: 5
   
 STT:
-  type: "Whisper"
+  type: "Whisper"  # Options: ("Whisper", "No STT")
   model_size: "Large"
