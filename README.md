@@ -42,6 +42,14 @@ The `config.yaml` file allows you to adjust key parameters for each stage of the
     - `type`: Only Whisper model (working on accurate alternatives).
     - `model_size`: Whisper model size ("Small", "Large", "Turbo").
 
+- **Speaker Filtering**
+
+    - `osd_min_overlap_sec`: Seconds threshold to consider an audio "dirty" from Overlapped Speech Detection.
+    - `verification_cluster_method`: The clustering algorithm, which can be 'agglomerative' or 'spectral'.
+    - `verification_agglomerative_threshold`: Cosine distance threshold used for agglomerative clustering.
+    - `verification_spectral_min_clusters`: The minimum number of clusters for spectral clustering.
+    - `verification_spectral_max_clusters`: The maximum number of clusters for spectral clustering.
+
 You can modify these parameters in `config.yaml` to change how the pipeline processes your audio data.
 
 
@@ -81,6 +89,26 @@ pip install .
 # pipeline + metrics (installs core + heavy metric libs)
 pip install .[metrics]
 ```
+##  Prerequisites: Hugging Face Token
+
+To use the **Speaker Filtering** stage (Overlapped Speech Detection & Speaker Verification), you need a Hugging Face access token because the Pyannote models are gated.
+
+1.  **Get a Token**: Create a "Read" token in your [Hugging Face Settings](https://huggingface.co/settings/tokens).
+2.  **Accept Conditions**: Visit these model pages and accept the user conditions:
+    * [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0)
+    * [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
+    * [pyannote/overlapped-speech-detection](https://huggingface.co/pyannote/overlapped-speech-detection)
+3.  **Set the Environment Variable**:
+    Before running `main.py`, export the variable in your terminal:
+
+    ```bash
+    # Linux / Mac
+    export HF_TOKEN="your_hf_token_here"
+    
+    # Windows (PowerShell)
+    $env:HF_TOKEN="your_hf_token_here"
+    ```
+
 ## Running the pipeline
 Follow this step to use the pre processing pipeline:
 

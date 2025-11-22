@@ -20,3 +20,10 @@ VAD:  # This options control segment duration (mean and std)
 STT:
   type: "Whisper"  # Options: ("Whisper", "No STT")
   model_size: "Large"
+
+speaker_filtering:
+  apply_osd: true
+  apply_diarization: true
+  min_overlap: 0.05
+  cluster_threshold: 0.6
+  min_clusters: 2

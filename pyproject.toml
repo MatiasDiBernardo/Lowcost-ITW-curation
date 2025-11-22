@@ -25,6 +25,8 @@ pyyaml = "^6.0.2"
 openai-whisper = "^20240930"
 ffmpeg-python = "^0.3"          
 pydub = "^0.25.1"
+scikit-learn = "^1.5.0"
+pyannote-audio = "^3.4.0"
 
 [tool.poetry.extras]
 # metric calculation libraries are grouped here
