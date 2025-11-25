@@ -13,10 +13,11 @@ def low_resources_pipeline():
     # Applied voice activity detection (VAD)
     audio_vad(audios_to_process)
     
-    # Applied speaker diarization (SD)
-
     # Applied denoising
     audio_denoise(audios_to_process)
+    
+    # Applied Speaker & Overlap Filtering
+    audio_speaker_filt(audios_to_process)
     
     # Applied MOS filtering
     audio_filt(audios_to_process)

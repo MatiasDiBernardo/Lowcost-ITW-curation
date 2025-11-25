@@ -19,6 +19,16 @@ std_desv = config["VAD"]["std_desv"]
 
 den_type = config["denoising"]["type"]
 
+apply_osd = config["speaker_filtering"]["apply_osd"]
+apply_diarization = config["speaker_filtering"]["apply_diarization"]
+min_overlap = config["speaker_filtering"]["min_overlap"]
+hf_token = os.environ.get("HF_TOKEN")
+    
+if not hf_token and (apply_osd or apply_diarization):
+    print("\n[WARNING] 'HF_TOKEN' environment variable not found.")
+    print("Speaker filtering models (OSD/Diarization) may fail or require a manual login via CLI.")
+    print("To fix: export HF_TOKEN='your_token_here'\n")
+
 stt_type = config["STT"]["type"]
 
 TEST = config["test"]
@@ -32,6 +42,8 @@ from Denoising.deep_net import denoise_deep_net
 from Denoising.demucs import denoise_demucs
 
 from VAD.VAD import vad_audio_splitter 
+from SpeakerFiltering.osd import load_osd_pipeline, detect_overlapped_speech
+from SpeakerFiltering.speaker_verification import load_embedding_model, verify_multi_speaker_by_clustering
 from STT.whisper import stt_whisper
 
 def get_id():
@@ -132,6 +144,49 @@ def audio_denoise(path_audios):
             if den_type == "No denoising":
                 shutil.copy(input_audio, output_audio)
 
+def audio_speaker_filt(path_audios):
+    """
+    Filters out audio files that contain overlapped speech or multiple speakers.
+    It uses Pyannote models which require a valid Hugging Face token set in the
+    'HF_TOKEN' environment variable.
+
+    Args:
+        path_audios (list[str]): List of audio names processed in the previous stage.
+    """
+    
+    prev_path = os.path.join("Data", "Audios_Denoise")
+    filt_path = os.path.join("Data", "Audios_Speaker_Filt") 
+    
+    osd_pipeline = load_osd_pipeline(hf_token) if apply_osd else None
+    emb_inference = load_embedding_model(hf_token) if apply_diarization else None
+
+    name_folders = [name.split(".")[0] for name in path_audios]
+
+    for folder in tqdm(name_folders, desc="Filtering by Speaker/Overlap"):
+        
+        chunk_audios = os.listdir(os.path.join(prev_path, folder))
+        os.makedirs(os.path.join(filt_path, folder), exist_ok=True)
+
+        for audio in chunk_audios:
+            input_audio = os.path.join(prev_path, folder, audio)
+            output_audio = os.path.join(filt_path, folder, audio)
+            
+            is_rejected = False
+
+            # 1. Check Multi-Speaker
+            if apply_diarization and not is_rejected:
+                if verify_multi_speaker_by_clustering(input_audio, emb_inference): 
+                    is_rejected = True
+
+            # 2. Check Overlap
+            if apply_osd and not is_rejected:
+                if detect_overlapped_speech(input_audio, osd_pipeline, min_overlap):
+                    is_rejected = True
+
+            if not is_rejected:
+                shutil.copy(input_audio, output_audio)
+            else:
+                pass
 
 def audio_filt(path_audios):
     """Filters out audio files that don't meet threshold criteria (NISQA or DNSMOS).
@@ -139,7 +194,7 @@ def audio_filt(path_audios):
     Args:
         path_audios (str): List of audio names in Audios_to_Process
     """
-    prev_path = os.path.join("Data", "Audios_Denoise") 
+    prev_path = os.path.join("Data", "Audios_Speaker_Filt") 
     filt_path = os.path.join("Data", "Audios_Clean") 
 
     name_folders = [name.split(".")[0] for name in path_audios]
