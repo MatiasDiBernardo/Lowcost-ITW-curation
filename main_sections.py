@@ -37,13 +37,13 @@ VERBOSE = config["verbose"]
 if not VERBOSE:
     warnings.simplefilter("ignore", UserWarning)
 
-from QualityPredition.NISQA import filtering_nisqa
+from QualityPrediction.NISQA import filtering_nisqa
 from Denoising.deep_net import denoise_deep_net
 from Denoising.demucs import denoise_demucs
 
 from VAD.VAD import vad_audio_splitter 
-from SpeakerFiltering.osd import load_osd_pipeline, detect_overlapped_speech
-from SpeakerFiltering.speaker_verification import load_embedding_model, verify_multi_speaker_by_clustering
+from SpeakerDiarization.osd import load_osd_pipeline, detect_overlapped_speech
+from SpeakerDiarization.speaker_verification import load_embedding_model, verify_multi_speaker_by_clustering
 from STT.whisper import stt_whisper
 
 def get_id():

@@ -3,6 +3,9 @@
 
 This repository contains an algorithm to select the best sections of noisy speech datasets, enabling the creation of high-quality datasets for ASR tasks.
 
+## Pipeline diagram
+![Pipeline diagram](Utils/assets/pipeline-diagram.PNG "Flow chart")
+
 ## Folder Structure
 
 All data folders are located inside the main `Data` directory. You can automatically create all required folders using the script `Utils/create_folder_structure.py`.
@@ -39,11 +42,10 @@ The `config.yaml` file allows you to adjust key parameters for each stage of the
     - `type`: Denoising model ("None", "Demucs" or "DeepFilterNet").
 
 - **Transcription (STT)**
-    - `type`: Only Whisper model (working on accurate alternatives).
+    - `type`: Only Whisper model at the moment (working on more accurate alternatives).
     - `model_size`: Whisper model size ("Small", "Large", "Turbo").
 
-- **Speaker Filtering**
-
+- **Speaker Diarization**
     - `osd_min_overlap_sec`: Seconds threshold to consider an audio "dirty" from Overlapped Speech Detection.
     - `verification_cluster_method`: The clustering algorithm, which can be 'agglomerative' or 'spectral'.
     - `verification_agglomerative_threshold`: Cosine distance threshold used for agglomerative clustering.
@@ -51,7 +53,6 @@ The `config.yaml` file allows you to adjust key parameters for each stage of the
     - `verification_spectral_max_clusters`: The maximum number of clusters for spectral clustering.
 
 You can modify these parameters in `config.yaml` to change how the pipeline processes your audio data.
-
 
 ## Installation
 
@@ -91,7 +92,7 @@ pip install .[metrics]
 ```
 ##  Prerequisites: Hugging Face Token
 
-To use the **Speaker Filtering** stage (Overlapped Speech Detection & Speaker Verification), you need a Hugging Face access token because the Pyannote models are gated.
+To use the **Speaker Diarization** stage (Overlapped Speech Detection & Speaker Verification), you need a Hugging Face access token because the Pyannote models are gated.
 
 1.  **Get a Token**: Create a "Read" token in your [Hugging Face Settings](https://huggingface.co/settings/tokens).
 2.  **Accept Conditions**: Visit these model pages and accept the user conditions:
@@ -99,7 +100,7 @@ To use the **Speaker Filtering** stage (Overlapped Speech Detection & Speaker Ve
     * [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
     * [pyannote/overlapped-speech-detection](https://huggingface.co/pyannote/overlapped-speech-detection)
 3.  **Set the Environment Variable**:
-    Before running `main.py`, export the variable in your terminal:
+    Before running `main.py`, export the variable in your terminal (or handle it with a .env file):
 
     ```bash
     # Linux / Mac

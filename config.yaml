@@ -22,7 +22,7 @@ STT:
   model_size: "Large"
 
 speaker_filtering:
-  apply_osd: true
+  apply_osd: true  # osd = overlapped speech detection
   apply_diarization: true
   min_overlap: 0.05
   cluster_threshold: 0.6
