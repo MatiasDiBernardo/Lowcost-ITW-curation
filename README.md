@@ -128,7 +128,7 @@ If you use this repository or the evaluation methodology, please cite the paper.
 @ARTICLE{low-cost-ITW-2025,
   title        = "Evaluation of preprocessing pipelines in the creation of in-the-wild {TTS} datasets",
   author       = "Di Bernardo, Mat{\'\i}as and Misley, Emmanuel and Correa, Ignacio and Iacovelli, 
-  Mateo Garc{\'\i}a and Mellino, Sim{\'o}n and Gonzales Barrios, Gala Luc{\'\i}a",
+  Mateo Garc{\'\i}a and Mellino, Sim{\'o}n and Gonzalez Barrios, Gala Luc{\'\i}a",
   year         =  2025,
   primaryClass = "eess.AS",
   eprint       = "2510.03111"
