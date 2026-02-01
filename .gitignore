@@ -1,3 +1,6 @@
 /.vscode
 /Datos
 /Data
+/.venv
+*/__pycache__
+*.pyc

@@ -5,7 +5,6 @@ description = "Metric-driven preprocessing for in-the-wild TTS datasets"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-numpy = "^1.24"
 tqdm = "^4.67.1"
 setuptools = "^75.8.0"
 wheel = "^0.45.1"
