@@ -2,7 +2,7 @@ import os
 
 
 # Creates the main folders
-root_folder = "Datos"
+root_folder = "Data"
 name_folders_data = ["Audio_to_Process", "Audios_Raw", "Audios_Denoise", "Audios_VAD", "Audios_Clean", "Audios_Transcript", "Dataset"]
 
 for folder in name_folders_data:

@@ -1,4 +1,4 @@
-from QualityPredition.nisqa.nisqa.NISQA_model import nisqaModel, set_verbose
+from QualityPrediction.nisqa.nisqa.NISQA_model import nisqaModel, set_verbose
 
 import os
 import librosa
@@ -60,7 +60,7 @@ def run_audio_predict(audio_path: str, output_dir: str = OUTPUT_DIR, num_workers
         print('Running run_audio_predict')
     args = {'mode': 'predict_file', 'output_dir': output_dir, 'pretrained_model': 'weights/nisqa.tar', 'deg': audio_path, 'num_workers': num_workers, 'bs': batch_size, 'ms_channel': ms_channel }
     
-    # El audio no es válido si supera el máximo de tiempo establecido
+    # Audio is not valid if the duration is outside the limits (configured by the user)
     y, sr = librosa.load(audio_path, mono=True)
     audio_duration = len(y)/sr
     if audio_duration > MAX_SECONDS or audio_duration < MIN_SECONDS:

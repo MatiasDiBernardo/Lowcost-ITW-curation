@@ -4,7 +4,25 @@ import os
 from denoiser import pretrained
 from denoiser.dsp import convert_audio
 
-def DEMUCS(input_dir, output_dir):
+def denoise_demucs(input_audio, output_audio):
+    """Applied DEMUCS denoising algorithm. 
+
+    Args:
+        input_dir (str): Path to audio file in wav format and any sample rate.
+        output_dir (str): Path to audio output of denoised audio.
+    """
+
+    model = pretrained.dns64().cpu()
+    wav, sr = torchaudio.load(input_audio)
+    wav = convert_audio(wav.cpu(), sr, model.sample_rate, model.chin)
+
+    with torch.no_grad():
+        denoised_tensor = model(wav[None])[0]
+
+    torchaudio.save(output_audio, denoised_tensor, model.sample_rate)
+
+
+def demucs_batch(input_dir, output_dir):
     """Applied DEMUCS denoising algorithm. 
 
     Args:

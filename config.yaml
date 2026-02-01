@@ -3,7 +3,7 @@ test: false
 verbose: false 
 
 quality_prediction:
-  type: "NISQA"
+  type: "NISQA"  # Options: ("NISQA", "DNSMOS", "NO FILT")
   threshold: 3.8
   max_seconds: 40.0
   min_seconds: 8.0
@@ -11,13 +11,20 @@ quality_prediction:
   batch_size: 10
   save_scores: true
   
-denoising:
+denoising:  # Options: ("DeepFilterNet", "Demucs", "No denoising")
   type: "DeepFilterNet"
 
-VAD:
+VAD:  # This options control segment duration (mean and std)
   mean_duration: 15
   std_desv: 5
   
 STT:
-  type: "Whisper"
+  type: "Whisper"  # Options: ("Whisper", "No STT")
   model_size: "Large"
+
+speaker_filtering:
+  apply_osd: true  # osd = overlapped speech detection
+  apply_diarization: true
+  min_overlap: 0.05
+  cluster_threshold: 0.6
+  min_clusters: 2
