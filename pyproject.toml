@@ -1,37 +1,42 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools>=75.8.0", "wheel>=0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "tts-pipeline"
 version = "0.1.0"
 description = "Metric-driven preprocessing for in-the-wild TTS datasets"
+requires-python = ">=3.9"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-tqdm = "^4.67.1"
-setuptools = "^75.8.0"
-wheel = "^0.45.1"
-pillow = "^11.1.0"
-pip = "^25.0"
-numpy = "^1.26.4"
-scipy = "^1.13.1"
-pandas = "^1.3.5"
-torch = "^2.6.0"
-torchaudio = "^2.6.0"
-soundfile = "^0.12"
-silero-vad = "^5.1.2"
-optuna = "^4.2.1"
-deepfilternet = "^0.5.6"
-demucs = "^4.0.1"
-numba = "^0.60.0"
-pyyaml = "^6.0.2"
-openai-whisper = "^20240930"
-ffmpeg-python = "^0.3"          
-pydub = "^0.25.1"
-scikit-learn = "^1.5.0"
-pyannote-audio = "^3.4.0"
+dependencies = [
+"tqdm >= 4.67.1",
+"pillow >= 11.1.0",
+"numpy >= 1.26.4",
+"scipy >= 1.13.1",
+"pandas >= 1.3.5",
+"torch >= 2.6.0",
+"torchaudio >= 2.6.0",
+"soundfile >= 0.12",
+"silero-vad >= 5.1.2",
+"optuna >= 4.2.1",
+"deepfilternet >= 0.5.6",
+"demucs >= 4.0.1",
+"numba >= 0.60.0",
+"pyyaml >= 6.0.2",
+"openai-whisper >= 20240930",
+"ffmpeg-python >= 0.2",
+"pydub >= 0.25.1",
+"scikit-learn >= 1.5.0",
+"pyannote-audio >= 3.4.0"
+]
 
-[tool.poetry.extras]
+[project.optional-dependencies]
 # metric calculation libraries are grouped here
 metrics = [
   "pesto-pitch",       
   "pymcd",             
-  "pyroomacoustics",   
+  "pyroomacoustics"   
 ]
+
+[tool.setuptools.packages.find]
+include = ["Lowcost-ITW-curation*"] 

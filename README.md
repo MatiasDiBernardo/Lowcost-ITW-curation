@@ -82,8 +82,6 @@ python -m venv .venv
 # macOS / Linux
 source .venv/bin/activate
 
-pip install --upgrade pip setuptools wheel
-
 # pipeline only
 pip install .
 

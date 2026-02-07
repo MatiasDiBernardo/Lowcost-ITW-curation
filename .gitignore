@@ -2,5 +2,6 @@
 /Datos
 /Data
 /.venv
-*/__pycache__
+__pycache__/
 *.pyc
+QualityPrediction/Results
