@@ -106,12 +106,13 @@ class ComputeScore:
 def main(args):
     models = glob.glob(os.path.join(args['testset_dir'], "*"))
     audio_clips_list = []
-    p808_model_path = os.path.join('DNSMOS', 'model_v8.onnx')
+    current_path = os.path.join('QualityPrediction', 'dnsmos')
+    p808_model_path = os.path.join(current_path, 'DNSMOS', 'model_v8.onnx')
 
     if args['personalized_MOS']:
-        primary_model_path = glob.glob(os.path.join('pDNSMOS', 'sig_bak_ovr.onnx'))[0]
+        primary_model_path = glob.glob(os.path.join(current_path,'pDNSMOS', 'sig_bak_ovr.onnx'))[0]
     else:
-        primary_model_path = glob.glob(os.path.join('DNSMOS', 'sig_bak_ovr.onnx'))[0]
+        primary_model_path = glob.glob(os.path.join(current_path, 'DNSMOS', 'sig_bak_ovr.onnx'))[0]
 
     compute_score = ComputeScore(primary_model_path, p808_model_path)
 
@@ -127,11 +128,10 @@ def main(args):
         mp3s = glob.glob(os.path.join(audio_path, "*.mp3"))
         audio_clips_list = wavs + mp3s
         while len(audio_clips_list) == 0 and max_recursion_depth > 0:
-            # audio_path = glob.glob(os.path.join(audio_path, "**"))
             audio_clips_list = glob.glob(os.path.join(audio_path, "*.wav"))
-            # nested_mp3 = glob.glob(os.path.join(audio_path, "*.mp3"))
+            nested_mp3 = glob.glob(os.path.join(audio_path, "*.mp3"))
             # print(f'nested_mp3: {nested_mp3}')
-            # audio_clips_list = audio_clips_list + nested_mp3 if nested_mp3.count() > 0 else audio_clips_list
+            audio_clips_list = audio_clips_list + nested_mp3 if len(nested_mp3) > 0 else audio_clips_list
             max_recursion_depth -= 1
         if len(audio_clips_list) > 0 and audio_clips_list[0] != []:
             clips.extend(audio_clips_list)

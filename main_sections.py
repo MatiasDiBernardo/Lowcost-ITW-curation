@@ -13,7 +13,6 @@ with open("config.yaml", "r") as f:
 # Loads configuration from config.yaml file
 filt_type = config["quality_prediction"]["type"]
 
-mos_pred_type = config["VAD"]["type"]
 mean_duration = config["VAD"]["mean_duration"]
 std_desv = config["VAD"]["std_desv"]
 
@@ -37,7 +36,8 @@ VERBOSE = config["verbose"]
 if not VERBOSE:
     warnings.simplefilter("ignore", UserWarning)
 
-from QualityPrediction.NISQA import filtering_nisqa
+from QualityPrediction.NISQA import filter_audios_by_nisqa
+from QualityPrediction.DNSMOS import filter_audios_by_dnsmos
 from Denoising.deep_net import denoise_deep_net
 from Denoising.demucs import denoise_demucs
 
@@ -50,7 +50,7 @@ def get_id():
     """Checks the processed audios folder and gets the last index.
     This renaming pretends to avoids duplicates and naming errors.
     """
-    folder_data = "Datos/Audios_VAD"
+    folder_data = "Data/Audios_VAD"
     data = os.listdir(folder_data)
     if len(data) == 0:
         return 0
@@ -199,24 +199,27 @@ def audio_filt(path_audios):
 
     name_folders = [name.split(".")[0] for name in path_audios]
 
-    for folder in tqdm(name_folders, desc="Cleaning audios"):
+    for folder_name in tqdm(name_folders, desc="Cleaning audios"):
 
-        chunk_audios = os.listdir(os.path.join(prev_path, folder))
-        os.makedirs(os.path.join(filt_path, folder), exist_ok=True)
+        folder_path = os.path.join(prev_path, folder_name)
+        os.makedirs(os.path.join(filt_path, folder_name), exist_ok=True)
 
-        for audio in chunk_audios:
-            input_audio = os.path.join(prev_path, folder, audio)
-            output_audio = os.path.join(filt_path, folder, audio)
-            
-            if filt_type == "NISQA":
-                if filtering_nisqa(input_audio):
-                    shutil.copy(input_audio, output_audio)
-                    
-            # if filt_type == "DNSMOS":
-                # Complete
-            
-            if filt_type == "NO FILT":
-                shutil.copy(input_audio, output_audio)
+        filtered_audios = []
+
+        if filt_type == "NISQA":
+            filtered_audios = filter_audios_by_nisqa(folder_path)
+                
+        elif filt_type == "DNSMOS":
+            filtered_audios = filter_audios_by_dnsmos(folder_path)
+        
+        elif filt_type == "NO FILT":
+            filtered_audios = os.listdir(folder_path)
+
+        for audio in filtered_audios:
+            # audio can be either the name or the path, depending on the filter function. Using basename to be sure to get the name in both cases.
+            input_audio = os.path.join(folder_path, os.path.basename(audio)) 
+            output_audio = os.path.join(filt_path, folder_name, os.path.basename(audio)) 
+            shutil.copy(input_audio, output_audio)
 
 def audio_transcript(path_audios):
     """Create transcription of the audios and moves them to the Audios_Transcript folder.
@@ -252,7 +255,7 @@ def audio_transcript(path_audios):
         
         if len(data) != 0:
             df = pd.DataFrame(data, columns=["Audio Path", "Transcription"])
-            name_csv_file = os.path.join(transcript_path, "transcripts", f"{folder}.csv")
+            name_csv_file = os.path.join(transcript_path, f"transcript_{folder}.csv")
             df.to_csv(name_csv_file, index=False, encoding="utf-8")
 
 

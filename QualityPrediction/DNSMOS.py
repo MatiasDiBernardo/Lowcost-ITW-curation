@@ -14,7 +14,7 @@ with open("config.yaml", "r") as f:
 nisqa_config = config["quality_prediction"]
 VERBOSE = config["verbose"]
 
-OUTPUT_DIR = ''  # Si se le asigna valor, graba un csv con los resultados de NISQA en la ruta que se le pase.
+OUTPUT_DIR = 'QualityPrediction/Results/DNSMOS' 
 THRESHOLD = nisqa_config["threshold"]
 MAX_SECONDS = nisqa_config["max_seconds"]
 MIN_SECONDS = nisqa_config["min_seconds"]
@@ -22,16 +22,15 @@ NUM_WORKERS = nisqa_config["num_workers"]
 BATCH_SIZE = nisqa_config["batch_size"]
 SAVE_SCORES = nisqa_config["save_scores"]
 
-def run_audio_predict(audio_path: str, output_dir: str, personalized_MOS: bool = False, result_type: str = 'bool', threshold: float = THRESHOLD):
+def get_dnsmos_score(audio_path: str, output_dir: str = OUTPUT_DIR, personalized_MOS: bool = False, result_type: str = 'bool', threshold: float = THRESHOLD):
     set_verbose(VERBOSE)
     if VERBOSE:
         print('Running run_audio_predict DNSMOS...')
+
     args = {'testset_dir': audio_path, 'personalized_MOS': personalized_MOS }
 
     if SAVE_SCORES:
-        csv_path = f'{output_dir}/DNSMOS_Results.csv'
-        args['csv_path'] = csv_path
-
+        args['csv_path'] = f'{output_dir}/DNSMOS_Results.csv'
     
     # El audio no es válido si supera el máximo de tiempo establecido
     y, sr = librosa.load(audio_path, mono=True)
@@ -50,27 +49,23 @@ def run_audio_predict(audio_path: str, output_dir: str, personalized_MOS: bool =
     elif result_type == 'dnsmos':
         return mos
 
-def run_folder_predict(input_dir: str, output_dir: str, personalized_MOS: bool = False, result_type: str = 'bool', threshold: float = THRESHOLD):
+def filter_audios_by_dnsmos(input_dir: str, output_dir: str = OUTPUT_DIR, personalized_MOS: bool = False, result_type: str = 'list', threshold: float = THRESHOLD):
     ''' If personalized_MOS is True, it penalizes interfering speakers.
     '''
     set_verbose(VERBOSE)
     if VERBOSE:
         print('Running run_folder_predict DNSMOS...')
-    csv_path = f'{output_dir}/DNSMOS_Results.csv'
-    args = {'testset_dir': input_dir, 'csv_path': csv_path, 'personalized_MOS': personalized_MOS }
-    
-    main(args)
-    df = pd.read_csv(csv_path)
 
-    if result_type == 'bool':
-        out = []
-        wavs = glob(os.path.join(input_dir, '*.wav'))
-        mp3s = glob(os.path.join(input_dir, '*.mp3'))
-        files = wavs + mp3s
-        for file in files:
-            mos = df.loc[df['filename'] == file, 'OVRL'].values[0]
-            out.append(mos >= threshold)
-        return out
+    args = {'testset_dir': input_dir, 'personalized_MOS': personalized_MOS }
+
+    if SAVE_SCORES:
+        os.makedirs(output_dir, exist_ok=True)
+        args['csv_path'] = os.path.join(output_dir, f'{os.path.basename(input_dir)}_DNSMOS_Results.csv')
+    
+    df = main(args)
+
+    if result_type == 'list':        
+        return [row['filename'] for _, row in df.iterrows() if row['OVRL'] >= threshold]
     elif result_type == 'df':
         return df
     elif result_type == 'dnsmos':
@@ -103,7 +98,7 @@ def run_multifolder_predict(root_path: str, result_type: str = 'mean', starting_
             mos = np.array(res['mos_pred'])
         else:
             try:
-                mos = run_folder_predict(f, f, result_type='dnsmos')
+                mos = filter_audios_by_dnsmos(f, f, result_type='dnsmos')
             except ValueError:
                 num_audios.append(-1)
                 means.append(-1)

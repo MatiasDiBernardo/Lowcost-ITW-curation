@@ -12,7 +12,7 @@ with open("config.yaml", "r") as f:
 nisqa_config = config["quality_prediction"]
 VERBOSE = config["verbose"]
 
-OUTPUT_DIR = ''  # Si se le asigna valor, graba un csv con los resultados de NISQA en la ruta que se le pase.
+OUTPUT_DIR = 'QualityPrediction/Results/NISQA'
 THRESHOLD = nisqa_config["threshold"]
 MAX_SECONDS = nisqa_config["max_seconds"]
 MIN_SECONDS = nisqa_config["min_seconds"]
@@ -21,8 +21,8 @@ BATCH_SIZE = nisqa_config["batch_size"]
 SAVE_SCORES = nisqa_config["save_scores"]
 
 
-def run_folder_predict(input_dir: str, output_dir: str = OUTPUT_DIR, num_workers: int = NUM_WORKERS, batch_size: str = BATCH_SIZE, ms_channel: str = None):
-    ''' Evalúa si la calidad de los audios (.wav o .mp3) de una carpeta superan el umbral, usando el modelo NISQA. Retorna un array de booleanos.
+def filter_audios_by_nisqa(input_dir: str, output_dir: str = OUTPUT_DIR, num_workers: int = NUM_WORKERS, batch_size: str = BATCH_SIZE, ms_channel: str = None):
+    ''' Evalúa si la calidad de los audios (.wav o .mp3) de una carpeta superan el umbral, usando el modelo NISQA. Retorna un array con el nombre de los archivos que lo superaron.
     
         Recibe los parámetros que recibiría NISQA por consola y los mete en un dict, tomado del archivo 'run_predict.py' de NISQA.
         Inicializa el modelo con los parámetros y ejecuta la predicción. Esta devuelve un DataFrame, del que se obtiene la predicción de MOS.
@@ -31,24 +31,23 @@ def run_folder_predict(input_dir: str, output_dir: str = OUTPUT_DIR, num_workers
 
     set_verbose(VERBOSE)    
     if VERBOSE:
-        print('Running run_folder_predict')
-    args = {'mode': 'predict_dir', 'output_dir': output_dir, 'pretrained_model': 'weights/nisqa.tar', 'data_dir': input_dir, 'num_workers': num_workers, 'bs': batch_size, 'ms_channel': ms_channel }
+        print('Running filter_audios_by_nisqa...')
+
+    args = {'mode': 'predict_dir', 'pretrained_model': 'weights/nisqa.tar', 'data_dir': input_dir, 'num_workers': num_workers, 'bs': batch_size, 'ms_channel': ms_channel }
+    
+    if SAVE_SCORES and output_dir == '':
+        raise ValueError("If 'save_scores' is True, 'output_dir' must be specified to save the NISQA results CSV file.")
+    
+    if SAVE_SCORES:
+        args['output_dir'] = os.path.join(output_dir, os.path.basename(input_dir))
+        os.makedirs(args['output_dir'], exist_ok=True)
 
     nisqa = nisqaModel(args)
     df = nisqa.predict()
 
-    out = []
-    wavs = glob(os.path.join(input_dir, '*.wav'))
-    mp3s = glob(os.path.join(input_dir, '*.mp3'))
-    files = wavs + mp3s
-    files = [os.path.basename(file) for file in files]
-    for file in files:
-        mos = df.loc[df['deg'] == file, 'mos_pred'].values[0]
-        out.append(mos >= THRESHOLD)
+    return [row['deg'] for _, row in df.iterrows() if row['mos_pred'] >= THRESHOLD]
 
-    return out
-
-def run_audio_predict(audio_path: str, output_dir: str = OUTPUT_DIR, num_workers: int = NUM_WORKERS, batch_size: str = BATCH_SIZE, ms_channel: str = None):
+def get_nisqa_score(audio_path: str, output_dir: str = OUTPUT_DIR, num_workers: int = NUM_WORKERS, batch_size: str = BATCH_SIZE, ms_channel: str = None):
     ''' Evalúa y retorna si la calidad de un audio supera el umbral, usando el modelo NISQA.
     
         Recibe los parámetros que recibiría NISQA por consola y los mete en un dict, tomado del archivo 'run_predict.py' de NISQA.
@@ -69,5 +68,8 @@ def run_audio_predict(audio_path: str, output_dir: str = OUTPUT_DIR, num_workers
     nisqa = nisqaModel(args)
     df = nisqa.predict()
     mos = df.loc[0, 'mos_pred']
+
+    if SAVE_SCORES and output_dir == '':
+        raise ValueError("If 'save_scores' is True, 'output_dir' must be specified to save the NISQA results CSV file.")
 
     return mos >= THRESHOLD
